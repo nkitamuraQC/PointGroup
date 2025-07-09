@@ -57,7 +57,8 @@ class GetCharacter:
     def get_grid_amps(self, kidx, orb_idx):
         raise NotImplementedError
 
-
+    def get_ch_occnum_vector(self):
+        return
     
     def get_character(self, kidx, orb_idx, symm_idx, mode="site"):
         if mode == "site":
