@@ -42,6 +42,9 @@ class GetSALC:
                 weights[(x, y, z)] += amp * self.ir_ch[sym_idx]
         return weights
 
+    def get_ham(self):
+        raise NotImplementedError
+
 
 
 
