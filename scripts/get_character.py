@@ -58,7 +58,7 @@ class GetCharacter:
         raise NotImplementedError
 
     def get_ch_occnum_vector(self):
-        return
+        raise NotImplementedError
     
     def get_character(self, kidx, orb_idx, symm_idx, mode="site"):
         if mode == "site":
