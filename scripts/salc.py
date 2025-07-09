@@ -39,7 +39,7 @@ class GetSALC:
             applied = apply_for_orb(samp, rot, trs)
             for xyz, amp in applied.items():
                 x, y, z = xyz
-                weights[(x, y, z)] += amp
+                weights[(x, y, z)] += amp * self.ir_ch[sym_idx]
         return weights
 
 
