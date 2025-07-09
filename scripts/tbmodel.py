@@ -29,6 +29,10 @@ class TBModel:
         self.pythtb_obj = w90(self.path, self.prefix).model()
         self.cell = self.pythtb_obj._lat
         self.pos = self.pythtb_obj._orb
+        self.pos_with_corner = self._fill_corners()
+        return
+
+    def _fill_corners(self):
         return
     
     def get_sym_kpts(self):
