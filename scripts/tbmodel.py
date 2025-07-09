@@ -8,13 +8,15 @@ class TBModel:
             wannier_prefix: str, 
             wannier_plot: str,
             nk: list = [4, 1, 1],
-            site_species: list = [0]
+            site_species: list = [0],
+            site_nlm: list = [(1,0,0)],
         ):
         self.path = wannier_path
         self.prefix = wannier_prefix
         self.wannier_plot = wannier_plot
         self.nk = nk
         self.site_species = site_species
+        self.site_nlm = site_nlm
         self.pythtb_obj = None
         self.cell = None
         self.pos = None
