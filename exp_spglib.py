@@ -10,5 +10,7 @@ numbers= [1,] * 2
 cell = (lattice, positions, numbers)
 # print("space group:", spglib.get_spacegroup(cell, symprec=1e-5))
 mesh = [8, 8, 8]
+# print("symmetry:", spglib.spglib.get_symmetry_dataset(cell)["pointgroup"])
 print("symmetry:", spglib.spglib.get_symmetry(cell))
+print(spglib.spglib.get_symmetry(cell)["translations"].shape[0])
 # print("symmetry_dataset:", spglib.spglib.get_symmetry_dataset(cell))
