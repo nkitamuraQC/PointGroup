@@ -19,6 +19,8 @@ class GetCharacter:
         self.Umat = tbmodel.Umat ## site, k, band
         self.dataset = None
         self.pos = self.tbmodel.pos ## nsite, ndim
+        self.site_species = self.tbmodel.site_species
+        self.site_nlm = self.tbmodel.site_nlm
 
     def gen_space_group(self): # international
         cell = (self.tbmodel.cell, self.tbmodel.pos, self.tbmodel.site_species)
