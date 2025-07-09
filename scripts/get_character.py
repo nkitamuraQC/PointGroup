@@ -77,8 +77,4 @@ class GetCharacter:
             raise NotImplementedError
         else:
             raise NotImplementedError
-
-
-
-        return
     
