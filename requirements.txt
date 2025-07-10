@@ -1,3 +1,4 @@
 spglib
 numpy
 seekpath
+scipy
