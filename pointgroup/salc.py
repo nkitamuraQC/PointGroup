@@ -1,6 +1,6 @@
 from .get_character import GetCharacter
 from .schonflies import schonflies
-from .pg_lib import point_group
+from .pg_lib import point_group, get_rep
 from .sym_op import (
     apply_for_orb
 )
@@ -23,6 +23,14 @@ class GetSALC:
             amp_site[(x, y, z)] = 1
             results.append(amp_site)
         return results
+
+    def search_op(self, op):
+        reps = get_rep(self.getc.cell)
+        for rep_name, rep in reps:
+            diff = np.flatten(rep) - np.flatten(op)
+            if np.linalg.norm(diff) < 1e-6:
+                return rep_name
+        return None
     
     def make_salc_site(self, sym_idx):
         ## s軌道的な対称性のみ対象;
@@ -35,11 +43,12 @@ class GetSALC:
             for xyz in samp:
                 x, y, z = xyz
                 weights[(x, y, z)] = 0
+        op_name = self.search_op(rot)
         for samp in site_amps:
             applied = apply_for_orb(samp, rot, trs)
             for xyz, amp in applied.items():
                 x, y, z = xyz
-                weights[(x, y, z)] += amp * self.ir_ch[sym_idx]
+                weights[(x, y, z)] += amp * self.ir_ch[self.pg][op_name]
         return weights
 
     def reconst_umat(self):
