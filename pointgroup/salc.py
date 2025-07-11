@@ -1,6 +1,6 @@
 from .get_character import GetCharacter
 from .schonflies import schonflies
-from .point_groups import point_group
+from .pg_lib import point_group
 from .sym_op import (
     apply_for_orb
 )
