@@ -8,6 +8,7 @@ from .transform import (
 )
 from scipy.spatial.transform import Rotation as R
 
+## cellの有無で変換をスイッチする
 
 def identity():
     return np.identity(3)
