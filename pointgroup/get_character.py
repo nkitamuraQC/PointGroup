@@ -10,7 +10,18 @@ import numpy as np
 from .pglib import tr2o3
 
 class GetCharacter:
+    """
+    Tight-bindingモデルから点群・空間群のキャラクター（指標）を計算するためのユーティリティクラス。
+    spglibによる対称操作取得、軌道・サイトごとのアンプリチュード取得、
+    およびキャラクター計算のための補助関数を提供する。
+    """
     def __init__(self, tbmodel: TBModel):
+        """
+        Parameters
+        ----------
+        tbmodel : TBModel
+            タイトバインディングモデルのインスタンス。
+        """
         self.tbmodel = tbmodel
         self.spg = None
         self.pg = None
@@ -18,14 +29,17 @@ class GetCharacter:
         self.rot = None
         self.rot_o3 = None
         self.trans = None
-        self.Umat = tbmodel.Umat ## site, k, band
+        self.Umat = tbmodel.Umat  # site, k, band
         self.dataset = None
-        self.pos = self.tbmodel.pos ## nsite, ndim
+        self.pos = self.tbmodel.pos  # nsite, ndim
         self.tbcell = self.tbmodel.cell
         self.site_species = self.tbmodel.site_species
         self.site_nlm = self.tbmodel.site_nlm
 
-    def _gen_space_group(self): # international
+    def _gen_space_group(self):
+        """
+        spglibを用いて空間群（international symbol）を取得し、self.spgに格納する。
+        """
         cell = (self.tbmodel.cell, self.tbmodel.pos, self.tbmodel.site_species)
         if self.dataset is None:
             self.dataset = spglib.spglib.get_symmetry_dataset(cell)
@@ -33,6 +47,9 @@ class GetCharacter:
         return
     
     def _gen_point_group(self):
+        """
+        spglibを用いて点群（point group symbol）を取得し、self.pgに格納する。
+        """
         cell = (self.tbmodel.cell, self.tbmodel.pos, self.tbmodel.site_species)
         if self.dataset is None:
             self.dataset = spglib.spglib.get_symmetry_dataset(cell)
@@ -40,6 +57,10 @@ class GetCharacter:
         return
     
     def _get_symm_ops(self):
+        """
+        spglibを用いて全対称操作（回転・並進）を取得し、
+        O(3)回転行列へ変換してself.rot_o3に格納する。
+        """
         cell = (self.tbmodel.cell, self.tbmodel.pos, self.tbmodel.site_species)
         self.symm_ops = spglib.spglib.get_symmetry(cell)
         self.rot = self.symm_ops["rotations"]
@@ -52,9 +73,25 @@ class GetCharacter:
         return
     
     def _get_site_amps(self, kidx, orb_idx):
+        """
+        指定したk点・バンドのサイトごとのアンプリチュード（波動関数成分）を取得する。
+        原点サイトの場合は格子ベクトル平行移動分も登録する。
+
+        Parameters
+        ----------
+        kidx : int
+            k点インデックス
+        orb_idx : int
+            バンド（軌道）インデックス
+
+        Returns
+        -------
+        site_amps : dict
+            {(x, y, z): amp} の辞書
+        """
         site_amps = {}
-        umat = self.Umat[:, kidx, orb_idx] ## nsite
-        pos = self.tbmodel.pos ## nsite, (x, y, z)
+        umat = self.Umat[:, kidx, orb_idx]  # nsite
+        pos = self.tbmodel.pos  # nsite, (x, y, z)
         nsites = pos.shape[0]
         for i in range(nsites):
             x, y, z = pos[i]
@@ -69,18 +106,51 @@ class GetCharacter:
                 site_amps[(x, y, z)] = umat[i]
                 x, y, z = current_pos+self.tbcell[0]+self.tbcell[1]
                 site_amps[(x, y, z)] = umat[i]
-                x, y, z = current_pos+self.tbcell[0]+self.tbcell[1]+self.tbcell[2]
+                # 3つの格子ベクトルの和
+                x, y, z = current_pos + self.tbcell[0] + self.tbcell[1]
+                site_amps[(x, y, z)] = umat[i]
+                x, y, z = current_pos + self.tbcell[0] + self.tbcell[2]
+                site_amps[(x, y, z)] = umat[i]
+                x, y, z = current_pos + self.tbcell[1] + self.tbcell[2]
+                site_amps[(x, y, z)] = umat[i]
+                # 3つの格子ベクトルの和（1行が長くなるのを回避）
+                vec = self.tbcell[0] + self.tbcell[1] + self.tbcell[2]
+                x, y, z = current_pos + vec
                 site_amps[(x, y, z)] = umat[i]
         return site_amps
 
-
     def _get_grid_amps(self, kidx, orb_idx):
+        """
+        グリッド上のアンプリチュード（波動関数成分）を取得する（未実装）。
+        """
         raise NotImplementedError
-
+    
     def get_ch_occnum_vector(self):
+        """
+        キャラクターの占有数ベクトルを返す（未実装）。
+        """
         raise NotImplementedError
     
     def get_character(self, kidx, orb_idx, symm_idx, mode="site"):
+        """
+        指定したk点・バンド・対称操作に対するキャラクター（指標）を計算する。
+
+        Parameters
+        ----------
+        kidx : int
+            k点インデックス
+        orb_idx : int
+            バンド（軌道）インデックス
+        symm_idx : int
+            対称操作インデックス
+        mode : str
+            'site'または'grid'（デフォルト: 'site'）
+
+        Returns
+        -------
+        character : float or complex
+            キャラクター値
+        """
         self._gen_point_group()
         self._gen_space_group()
         self._get_symm_ops()
