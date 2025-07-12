@@ -6,7 +6,7 @@ def tr2o3(cell, R):
     L_inv = np.linalg.inv(L)
     return np.dot(np.dot(L, R), L_inv)
 
-def fromo3(cell, R):
+def from_o3(cell, R):
     L = cell
     L_inv = np.linalg.inv(L)
     return np.dot(np.dot(L_inv, R), L)
