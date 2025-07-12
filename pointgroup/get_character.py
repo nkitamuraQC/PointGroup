@@ -7,7 +7,7 @@ from .sym_op import (
     check_symmetry,
 )
 import numpy as np
-from pg_lib import tr2o3
+from .pg_lib import tr2o3
 
 class GetCharacter:
     def __init__(self, tbmodel: TBModel):
@@ -60,7 +60,7 @@ class GetCharacter:
             x, y, z = pos[i]
             site_amps[(x, y, z)] = umat[i]
             current_pos = np.array([x, y, z])
-            if np.linalg.norm(current_pos) < 1e-6
+            if np.linalg.norm(current_pos) < 1e-6:
                 x, y, z = current_pos+self.tbcell[0]
                 site_amps[(x, y, z)] = umat[i]
                 x, y, z = current_pos+self.tbcell[1]
