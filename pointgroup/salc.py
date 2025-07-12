@@ -46,6 +46,7 @@ class GetSALC:
                 x, y, z = xyz
                 weights[(x, y, z)] = 0
         op_name = self._search_op(rot_o3)
+        op_name = op_name.split(" ")[0]
         for samp in site_amps:
             applied = apply_for_orb(samp, rot, trs)
             for xyz, amp in applied.items():
