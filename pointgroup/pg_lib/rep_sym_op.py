@@ -72,6 +72,14 @@ def improper_rotation_matrix(axis, angle_deg, cell=None):
     return rot
 
 
+def improper_rotation_matrix_axis(axis, angle_deg, cell=None):
+    """ S_n = C_n followed by σh (mirror perpendicular to axis) """
+    rot = reflection_matrix_axis(axis, cell) @ rotation_matrix_axis(axis, angle_deg)
+    if cell is not None:
+        rot = from_o3(cell, rot)
+    return rot
+
+
 def reflection_matrix(plane, cell=None):
     if plane == 'xy':
         rot = np.diag([1, 1, -1])
