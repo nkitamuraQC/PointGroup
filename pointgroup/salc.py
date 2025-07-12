@@ -16,7 +16,7 @@ class GetSALC:
         self.rot = getc.rot
         self.rot_o3 = getc.rot_o3
 
-    def gen_site_amps(self):
+    def _gen_site_amps(self):
         results = []
         for i, coord in self.pos:
             amp_site = {}
@@ -25,7 +25,7 @@ class GetSALC:
             results.append(amp_site)
         return results
 
-    def search_op(self, op):
+    def _search_op(self, op):
         reps = get_rep()
         for rep_name, rep in reps:
             diff = np.ravel(rep) - np.ravel(op)
@@ -39,13 +39,13 @@ class GetSALC:
         rot = self.rot[sym_idx]
         rot_o3 = self.rot_o3[sym_idx]
         trs = self.translate[sym_idx]
-        site_amps = self.gen_site_amps()
+        site_amps = self._gen_site_amps()
         weights = {}
         for samp in site_amps:
             for xyz in samp:
                 x, y, z = xyz
                 weights[(x, y, z)] = 0
-        op_name = self.search_op(rot_o3)
+        op_name = self._search_op(rot_o3)
         for samp in site_amps:
             applied = apply_for_orb(samp, rot, trs)
             for xyz, amp in applied.items():

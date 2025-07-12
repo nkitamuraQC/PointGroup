@@ -25,21 +25,21 @@ class GetCharacter:
         self.site_species = self.tbmodel.site_species
         self.site_nlm = self.tbmodel.site_nlm
 
-    def gen_space_group(self): # international
+    def _gen_space_group(self): # international
         cell = (self.tbmodel.cell, self.tbmodel.pos, self.tbmodel.site_species)
         if self.dataset is None:
             self.dataset = spglib.spglib.get_symmetry_dataset(cell)
         self.spg = self.dataset["international"]
         return
     
-    def gen_point_group(self):
+    def _gen_point_group(self):
         cell = (self.tbmodel.cell, self.tbmodel.pos, self.tbmodel.site_species)
         if self.dataset is None:
             self.dataset = spglib.spglib.get_symmetry_dataset(cell)
         self.pg = self.dataset["pointgroup"]
         return
     
-    def get_symm_ops(self):
+    def _get_symm_ops(self):
         cell = (self.tbmodel.cell, self.tbmodel.pos, self.tbmodel.site_species)
         self.symm_ops = spglib.spglib.get_symmetry(cell)
         self.rot = self.symm_ops["rotations"]
@@ -51,7 +51,7 @@ class GetCharacter:
             self.rot_o3[i, :, :] = tr2o3(self.tbcell, R)
         return
     
-    def get_site_amps(self, kidx, orb_idx):
+    def _get_site_amps(self, kidx, orb_idx):
         site_amps = {}
         umat = self.Umat[:, kidx, orb_idx] ## nsite
         pos = self.tbmodel.pos ## nsite, (x, y, z)
@@ -59,20 +59,35 @@ class GetCharacter:
         for i in range(nsites):
             x, y, z = pos[i]
             site_amps[(x, y, z)] = umat[i]
+            current_pos = np.array([x, y, z])
+            if np.linalg.norm(current_pos) < 1e-6
+                x, y, z = current_pos+self.tbcell[0]
+                site_amps[(x, y, z)] = umat[i]
+                x, y, z = current_pos+self.tbcell[1]
+                site_amps[(x, y, z)] = umat[i]
+                x, y, z = current_pos+self.tbcell[2]
+                site_amps[(x, y, z)] = umat[i]
+                x, y, z = current_pos+self.tbcell[0]+self.tbcell[1]
+                site_amps[(x, y, z)] = umat[i]
+                x, y, z = current_pos+self.tbcell[0]+self.tbcell[1]+self.tbcell[2]
+                site_amps[(x, y, z)] = umat[i]
         return site_amps
 
 
-    def get_grid_amps(self, kidx, orb_idx):
+    def _get_grid_amps(self, kidx, orb_idx):
         raise NotImplementedError
 
     def get_ch_occnum_vector(self):
         raise NotImplementedError
     
     def get_character(self, kidx, orb_idx, symm_idx, mode="site"):
+        self._gen_point_group()
+        self._gen_space_group()
+        self._get_symm_ops()
         if mode == "site":
-            amps = self.get_site_amps(kidx, orb_idx)
+            amps = self._get_site_amps(kidx, orb_idx)
         elif mode == "grid":
-            amps = self.get_grid_amps(kidx, orb_idx)
+            amps = self._get_grid_amps(kidx, orb_idx)
         else:
             raise NotImplementedError
         
