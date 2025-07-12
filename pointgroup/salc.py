@@ -1,5 +1,5 @@
 from .get_character import GetCharacter
-from .schonflies import schonflies
+from .schonflies import point_group_map
 from .pg_lib import point_group, get_rep
 from .sym_op import (
     apply_for_orb
@@ -9,11 +9,12 @@ import numpy as np
 class GetSALC:
     def __init__(self, getc: GetCharacter):
         self.getc = getc
-        self.pg = schonflies[getc.pg]
+        self.pg = point_group_map[getc.pg]
         self.ir_ch = point_group[self.pg] ## 点群
         self.pos = getc.pos
         self.translate = getc.trans
         self.rot = getc.rot
+        self.rot_o3 = getc.rot_o3
 
     def gen_site_amps(self):
         results = []
@@ -25,9 +26,9 @@ class GetSALC:
         return results
 
     def search_op(self, op):
-        reps = get_rep(self.getc.cell)
+        reps = get_rep()
         for rep_name, rep in reps:
-            diff = np.flatten(rep) - np.flatten(op)
+            diff = np.ravel(rep) - np.ravel(op)
             if np.linalg.norm(diff) < 1e-6:
                 return rep_name
         return None
@@ -36,6 +37,7 @@ class GetSALC:
         ## s軌道的な対称性のみ対象;
         ## より精密には軌道のgrid情報必要
         rot = self.rot[sym_idx]
+        rot_o3 = self.rot_o3[sym_idx]
         trs = self.translate[sym_idx]
         site_amps = self.gen_site_amps()
         weights = {}
@@ -43,7 +45,7 @@ class GetSALC:
             for xyz in samp:
                 x, y, z = xyz
                 weights[(x, y, z)] = 0
-        op_name = self.search_op(rot)
+        op_name = self.search_op(rot_o3)
         for samp in site_amps:
             applied = apply_for_orb(samp, rot, trs)
             for xyz, amp in applied.items():

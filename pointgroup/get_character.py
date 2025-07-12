@@ -7,6 +7,7 @@ from .sym_op import (
     check_symmetry,
 )
 import numpy as np
+from pg_lib import tr2o3
 
 class GetCharacter:
     def __init__(self, tbmodel: TBModel):
@@ -15,10 +16,12 @@ class GetCharacter:
         self.pg = None
         self.symm_ops = None
         self.rot = None
+        self.rot_o3 = None
         self.trans = None
         self.Umat = tbmodel.Umat ## site, k, band
         self.dataset = None
         self.pos = self.tbmodel.pos ## nsite, ndim
+        self.tbcell = self.tbmodel.cell
         self.site_species = self.tbmodel.site_species
         self.site_nlm = self.tbmodel.site_nlm
 
@@ -41,6 +44,11 @@ class GetCharacter:
         self.symm_ops = spglib.spglib.get_symmetry(cell)
         self.rot = self.symm_ops["rotations"]
         self.trans = self.symm_ops["translations"]
+        
+        self.rot_o3 = np.zeros_like(self.rot)
+        for i in range(self.rot_o3.shape[0]):
+            R = self.rot_o3[i, :, :]
+            self.rot_o3[i, :, :] = tr2o3(self.tbcell, R)
         return
     
     def get_site_amps(self, kidx, orb_idx):
