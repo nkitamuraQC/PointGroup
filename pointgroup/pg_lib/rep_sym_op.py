@@ -1,3 +1,4 @@
+
 from scipy.spatial.transform import Rotation as R
 import numpy as np
 
@@ -9,6 +10,28 @@ from .transform import (
 from scipy.spatial.transform import Rotation as R
 
 ## cellの有無で変換をスイッチする
+
+def rotation_matrix_axis(axis_vec, angle_deg, cell=None):
+    """
+    任意の軸(axis_vec: 3次元ベクトル)まわりの回転行列を返す (Rodriguesの公式, scipy使用)
+    angle_deg: 回転角（度）
+    cell: 格子情報（必要に応じて渡す）
+    return: 3x3回転行列
+    """
+    axis_vec = np.asarray(axis_vec)
+    axis_vec = axis_vec / np.linalg.norm(axis_vec)
+    rot = R.from_rotvec(np.deg2rad(angle_deg) * axis_vec).as_matrix()
+    if cell is not None:
+        rot = from_o3(cell, rot)
+    return rot
+
+def reflection_matrix_axis(axis_vec, cell):
+    n = np.asarray(axis_vec)
+    n = n / np.linalg.norm(n)
+    rot = np.eye(3) - 2 * np.outer(n, n)
+    if cell is not None:
+        rot = from_o3(cell, rot)
+    return rot
 
 def identity():
     return np.identity(3)

@@ -10,6 +10,8 @@ from .rep_sym_op import (
     rotation_matrix, 
     improper_rotation_matrix, 
     reflection_matrix,
+    rotation_matrix_axis,
+    reflection_matrix_axis,
 )
 
 import numpy as np
@@ -148,8 +150,8 @@ def make_tetragonal(cell=None):
         'C4_3  C4^3(z)': rotation_matrix('z', 270, cell=cell),
         'C2x  C2(x)': rotation_matrix('x', 180, cell=cell),
         'C2y  C2(y)': rotation_matrix('y', 180, cell=cell),
-        'C2d1  C2(d1)': rotation_matrix(d1, 180, cell=cell),
-        'C2d2  C2(d2)': rotation_matrix(d2, 180, cell=cell)
+        'C2d1  C2(d1)': rotation_matrix_axis(d1, 180, cell=cell),
+        'C2d2  C2(d2)': rotation_matrix_axis(d2, 180, cell=cell)
     }
     # C4v (4回回転＋2回回転＋2鏡映×2)
     # sigmad1: x=y, sigmad2: x=-y
@@ -160,8 +162,8 @@ def make_tetragonal(cell=None):
         'C4_3  C4^3(z)': rotation_matrix('z', 270, cell),
         'sigmavxz  sigmav(xz)': reflection_matrix('xz', cell),
         'sigmavyz  sigmav(yz)': reflection_matrix('yz', cell),
-        'sigmad1  sigmad1': reflection_matrix([sqrt2_inv, sqrt2_inv, 0], cell),
-        'sigmad2  sigmad2': reflection_matrix([sqrt2_inv, -sqrt2_inv, 0], cell)
+        'sigmad1  sigmad1': reflection_matrix_axis([sqrt2_inv, sqrt2_inv, 0], cell),
+        'sigmad2  sigmad2': reflection_matrix_axis([sqrt2_inv, -sqrt2_inv, 0], cell)
     }
     # D2d (2回回転×3＋S4×2＋鏡映×2)
     point_groups['D2d'] = {
@@ -171,8 +173,8 @@ def make_tetragonal(cell=None):
         'C2y  C2(y)': rotation_matrix('y', 180, cell),
         'S4  S4': improper_rotation_matrix('z', 90, cell),
         'S4_3  S4^3': improper_rotation_matrix('z', 270, cell),
-        'sigmad1  sigmad1': reflection_matrix([sqrt2_inv, sqrt2_inv, 0], cell),
-        'sigmad2  sigmad2': reflection_matrix([sqrt2_inv, -sqrt2_inv, 0], cell)
+        'sigmad1  sigmad1': reflection_matrix_axis([sqrt2_inv, sqrt2_inv, 0], cell),
+        'sigmad2  sigmad2': reflection_matrix_axis([sqrt2_inv, -sqrt2_inv, 0], cell)
     }
     # D4h (4回回転＋2回回転×2＋反転＋S4×2＋鏡映×3)
     point_groups['D4h'] = {
@@ -222,8 +224,8 @@ def make_trigonal(cell=None):
         'C3  C3(z)': rotation_matrix('z', 120, cell=cell),
         'C3_2  C3^2(z)': rotation_matrix('z', 240, cell=cell),
         'C2_1  C2(1)': rotation_matrix('x', 180, cell=cell),
-        'C2_2  C2(2)': rotation_matrix(axis2, 180, cell=cell),
-        'C2_3  C2(3)': rotation_matrix(axis3, 180, cell=cell)
+        'C2_2  C2(2)': rotation_matrix_axis(axis2, 180, cell=cell),
+        'C2_3  C2(3)': rotation_matrix_axis(axis3, 180, cell=cell)
     }
     # C3v (3回回転＋鏡映×3)
     # sigmav2, sigmav3: z軸を含み120度, 240度回転した面
@@ -234,8 +236,8 @@ def make_trigonal(cell=None):
         'C3  C3(z)': rotation_matrix('z', 120, cell=cell),
         'C3_2  C3^2(z)': rotation_matrix('z', 240, cell=cell),
         'sigmav1  sigmav1': reflection_matrix('xz', cell=cell),
-        'sigmav2  sigmav2': reflection_matrix(sigmav2_axis, cell=cell),
-        'sigmav3  sigmav3': reflection_matrix(sigmav3_axis, cell=cell)
+        'sigmav2  sigmav2': reflection_matrix_axis(sigmav2_axis, cell=cell),
+        'sigmav3  sigmav3': reflection_matrix_axis(sigmav3_axis, cell=cell)
     }
     # D3d (3回回転＋2回回転×3＋反転＋鏡映×3)
     # sigmad1: xy面, sigmad2,3: xy面をz軸中心に120,240度回転
@@ -249,8 +251,8 @@ def make_trigonal(cell=None):
         'i  I': inversion(cell),
         'S6  S6': improper_rotation_matrix('z', 60, cell=cell),
         'sigmad1  sigmad1': reflection_matrix('xy', cell=cell),
-        'sigmad2  sigmad2': reflection_matrix(sigmad2_axis, cell=cell),
-        'sigmad3  sigmad3': reflection_matrix(sigmad3_axis, cell=cell)
+        'sigmad2  sigmad2': reflection_matrix_axis(sigmad2_axis, cell=cell),
+        'sigmad3  sigmad3': reflection_matrix_axis(sigmad3_axis, cell=cell)
     }
     return point_groups
 
@@ -308,8 +310,8 @@ def make_hexagonal(cell=None):
         'C3  C3': rotation_matrix('z', 120, cell),
         'C2  C2': rotation_matrix('z', 180, cell),
         'sigmav  sigmav': reflection_matrix('xz', cell),
-        'sigmav2  sigmav2': reflection_matrix(sigmav2_axis, cell),
-        'sigmav3  sigmav3': reflection_matrix(sigmav3_axis, cell)
+        'sigmav2  sigmav2': reflection_matrix_axis(sigmav2_axis, cell),
+        'sigmav3  sigmav3': reflection_matrix_axis(sigmav3_axis, cell)
     }
     # D3h (3回回転＋2回回転×3＋水平鏡映＋鏡映×3)
     # sigmav2, sigmav3: xz面をz軸中心に120,240度回転
@@ -322,8 +324,8 @@ def make_hexagonal(cell=None):
         'C2  C2': rotation_matrix('x', 180, cell),
         'sigmah  sigmah': reflection_matrix('xy', cell),
         'sigmav1  sigmav1': reflection_matrix('xz', cell),
-        'sigmav2  sigmav2': reflection_matrix(sigmav2_axis, cell),
-        'sigmav3  sigmav3': reflection_matrix(sigmav3_axis, cell)
+        'sigmav2  sigmav2': reflection_matrix_axis(sigmav2_axis, cell),
+        'sigmav3  sigmav3': reflection_matrix_axis(sigmav3_axis, cell)
     }
     # D6h (6回回転＋2回回転×3＋反転＋鏡映×6)
     # sigmad2: xz面をz軸中心に60度回転
@@ -337,7 +339,7 @@ def make_hexagonal(cell=None):
         'i  I': inversion(cell),
         'sigmah  sigmah': reflection_matrix('xy', cell),
         'sigmad1  sigmad1': reflection_matrix('xz', cell),
-        'sigmad2  sigmad2': reflection_matrix(sigmad2_axis, cell)
+        'sigmad2  sigmad2': reflection_matrix_axis(sigmad2_axis, cell)
     }
     return point_groups
 
