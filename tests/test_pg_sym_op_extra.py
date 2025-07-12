@@ -1,8 +1,8 @@
 import importlib
-from pointgroup.pg_lib import get_rep
+from pointgroup.pglib import get_rep
 
 def test_import():
-    importlib.import_module('pointgroup.pg_lib.pg_sym_op_extra')
+    importlib.import_module('pointgroup.pglib.pg_sym_op_extra')
 
 def test_num():
     reps = get_rep()

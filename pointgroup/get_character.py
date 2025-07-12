@@ -7,7 +7,7 @@ from .sym_op import (
     check_symmetry,
 )
 import numpy as np
-from .pg_lib import tr2o3
+from .pglib import tr2o3
 
 class GetCharacter:
     def __init__(self, tbmodel: TBModel):

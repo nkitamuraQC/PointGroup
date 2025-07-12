@@ -1,4 +1,4 @@
 import importlib
 
 def test_import():
-    importlib.import_module('pointgroup.pg_lib.rep_sym_op')
+    importlib.import_module('pointgroup.pglib.rep_sym_op')
