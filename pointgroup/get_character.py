@@ -8,6 +8,8 @@ from .sym_op import (
 )
 import numpy as np
 from .pglib import tr2o3
+from .schonflies import point_group_map
+from .utils import logger
 
 class GetCharacter:
     """
@@ -61,14 +63,14 @@ class GetCharacter:
         spglibを用いて全対称操作（回転・並進）を取得し、
         O(3)回転行列へ変換してself.rot_o3に格納する。
         """
-        cell = (self.tbmodel.cell, self.tbmodel.pos, self.tbmodel.site_species)
+        cell = (self.tbmodel.cell, self.tbmodel.pos, np.array(self.site_species))
         self.symm_ops = spglib.spglib.get_symmetry(cell)
         self.rot = self.symm_ops["rotations"]
         self.trans = self.symm_ops["translations"]
         
         self.rot_o3 = np.zeros_like(self.rot)
         for i in range(self.rot_o3.shape[0]):
-            R = self.rot_o3[i, :, :]
+            R = self.rot[i, :, :]
             self.rot_o3[i, :, :] = tr2o3(self.tbcell, R)
         return
     
@@ -96,27 +98,27 @@ class GetCharacter:
         for i in range(nsites):
             x, y, z = pos[i]
             site_amps[(x, y, z)] = umat[i]
-            current_pos = np.array([x, y, z])
-            if np.linalg.norm(current_pos) < 1e-6:
-                x, y, z = current_pos+self.tbcell[0]
-                site_amps[(x, y, z)] = umat[i]
-                x, y, z = current_pos+self.tbcell[1]
-                site_amps[(x, y, z)] = umat[i]
-                x, y, z = current_pos+self.tbcell[2]
-                site_amps[(x, y, z)] = umat[i]
-                x, y, z = current_pos+self.tbcell[0]+self.tbcell[1]
-                site_amps[(x, y, z)] = umat[i]
-                # 3つの格子ベクトルの和
-                x, y, z = current_pos + self.tbcell[0] + self.tbcell[1]
-                site_amps[(x, y, z)] = umat[i]
-                x, y, z = current_pos + self.tbcell[0] + self.tbcell[2]
-                site_amps[(x, y, z)] = umat[i]
-                x, y, z = current_pos + self.tbcell[1] + self.tbcell[2]
-                site_amps[(x, y, z)] = umat[i]
-                # 3つの格子ベクトルの和（1行が長くなるのを回避）
-                vec = self.tbcell[0] + self.tbcell[1] + self.tbcell[2]
-                x, y, z = current_pos + vec
-                site_amps[(x, y, z)] = umat[i]
+            # current_pos = np.array([x, y, z])
+            # if np.linalg.norm(current_pos) < 1e-6:
+            #     x, y, z = current_pos+self.tbcell[0]
+            #     site_amps[(x, y, z)] = umat[i]
+            #     x, y, z = current_pos+self.tbcell[1]
+            #     site_amps[(x, y, z)] = umat[i]
+            #     x, y, z = current_pos+self.tbcell[2]
+            #     site_amps[(x, y, z)] = umat[i]
+            #     x, y, z = current_pos+self.tbcell[0]+self.tbcell[1]
+            #     site_amps[(x, y, z)] = umat[i]
+            #     # 3つの格子ベクトルの和
+            #     x, y, z = current_pos + self.tbcell[0] + self.tbcell[1]
+            #     site_amps[(x, y, z)] = umat[i]
+            #     x, y, z = current_pos + self.tbcell[0] + self.tbcell[2]
+            #     site_amps[(x, y, z)] = umat[i]
+            #     x, y, z = current_pos + self.tbcell[1] + self.tbcell[2]
+            #     site_amps[(x, y, z)] = umat[i]
+            #     # 3つの格子ベクトルの和（1行が長くなるのを回避）
+            #     vec = self.tbcell[0] + self.tbcell[1] + self.tbcell[2]
+            #     x, y, z = current_pos + vec
+            #     site_amps[(x, y, z)] = umat[i]
         return site_amps
 
     def _get_grid_amps(self, kidx, orb_idx):
@@ -131,7 +133,7 @@ class GetCharacter:
         """
         raise NotImplementedError
     
-    def get_character(self, kidx, orb_idx, symm_idx, mode="site"):
+    def get_character(self, kidx=0, orb_idx=0, op_idx=0, mode="site"):
         """
         指定したk点・バンド・対称操作に対するキャラクター（指標）を計算する。
 
@@ -161,10 +163,15 @@ class GetCharacter:
         else:
             raise NotImplementedError
         
-        rot = self.rot[symm_idx]
-        trs = self.trans[symm_idx]
+        rot = self.rot[op_idx]
+        trs = self.trans[op_idx]
+        logger.info(f"pg: {point_group_map[self.pg]}")
+        logger.info(f"rot: {rot}")
+        logger.info(f"trs: {trs}")
         if mode == "site":
             result = apply_for_orb(amps, rot, trs)
+            logger.info(f"before: {amps}")
+            logger.info(f"after: {result}")
             charcter = check_symmetry(amps, result)
             return charcter
             

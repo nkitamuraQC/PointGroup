@@ -36,7 +36,7 @@ class GetSALC:
             各サイトごとのアンプリチュード辞書リスト
         """
         results = []
-        for i, coord in self.pos:
+        for coord in self.pos:
             amp_site = {}
             x, y, z = coord
             amp_site[(x, y, z)] = 1
@@ -51,14 +51,14 @@ class GetSALC:
         op_name : str or None
             一致する操作名（なければNone）
         """
-        reps = get_rep()
-        for rep_name, rep in reps:
+        reps = get_rep()[self.pg]
+        for rep_name, rep in reps.items():
             diff = np.ravel(rep) - np.ravel(op)
             if np.linalg.norm(diff) < 1e-6:
                 return rep_name
         return None
     
-    def make_salc_site(self, sym_idx):
+    def make_salc_site(self, sym_idx=0):
         """
         指定した対称操作インデックスに対するSALC重みを計算する。
         s軌道的な対称性のみ対応。
@@ -79,12 +79,12 @@ class GetSALC:
                 x, y, z = xyz
                 weights[(x, y, z)] = 0
         op_name = self._search_op(rot_o3)
-        op_name = op_name.split(" ")[0]
+        op_name = op_name.split()[0]
         for samp in site_amps:
             applied = apply_for_orb(samp, rot, trs)
             for xyz, amp in applied.items():
                 x, y, z = xyz
-                weights[(x, y, z)] += amp * self.ir_ch[self.pg][op_name]
+                weights[(x, y, z)] += amp * self.ir_ch[op_name][sym_idx]
         return weights
 
     def reconst_umat(self):

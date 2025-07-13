@@ -46,7 +46,7 @@ class TBModel:
         self.pos = None
         self.Umat = None
         if pythtb_obj is not None:
-            assert(pythtb_obj._dim_r < 3)
+            assert(pythtb_obj._dim_r == 3)
 
         self.path_sym = None
         self.path_coord = None
@@ -117,7 +117,7 @@ class TBModel:
         """
         一様k点メッシュをpythtbから取得しself.kptsに格納する。
         """
-        self.kpts = self.pythtb_obj.k_uniform_mesh(self, self.nk)
+        self.kpts = self.pythtb_obj.k_uniform_mesh(self.nk)
         return
     
     def _get_bands(self):

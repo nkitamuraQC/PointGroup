@@ -23,7 +23,13 @@ def check_symmetry(amps_dict, transformed_dict, tol=1e-6):
     results = []
     for k, amp1 in amps_dict.items():
         x, y, z = k
-        amp2 = transformed_dict[(x, y, z)]
+        if abs(amp1) <= 1e-6:
+            continue
+        try:
+            amp2 = transformed_dict[(x, y, z)]
+        except KeyError:
+            # results.append(0)
+            continue
         if abs(amp1 - amp2) < tol:
             results.append(1)
         elif abs(amp1 + amp2) < tol:

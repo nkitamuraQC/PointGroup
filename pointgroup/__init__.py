@@ -7,3 +7,6 @@ from .pglib import get_pg_ch
 from .pglib import get_rep
 from .pglib import point_group
 from .utils import visualize
+
+import warnings
+warnings.filterwarnings("ignore")
