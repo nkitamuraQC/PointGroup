@@ -57,9 +57,10 @@ def test_overall2():
     n = gcclass._get_symm_ops()
     res = []
     for i in range(n):
-        ch = gcclass.get_character(kidx=0, orb_idx=1, op_idx=i)
+        ch = gcclass.get_character(kidx=0, orb_idx=0, op_idx=i)
         res.append(ch)
-    print(res)
+    print(res.count(1))
+    print(res.count(-1))
     ir = GetIR(gcclass)
     h = ir._get_h()
     ch = np.ones((h))
