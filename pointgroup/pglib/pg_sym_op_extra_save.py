@@ -1,15 +1,3 @@
-def to_integer_rotation_matrix(mat, tol=1e-8):
-    """
-    spglib流に回転行列を整数（1, 0, -1）に丸める
-    """
-    mat_int = np.zeros_like(mat)
-    mat_int[np.abs(mat) < tol] = 0
-    mat_int[np.abs(mat - 1) < tol] = 1
-    mat_int[np.abs(mat + 1) < tol] = -1
-    # それ以外（例：±0.5, ±√3/2）はそのまま
-    mask = (mat_int == 0)
-    mat_int[mask] = mat[mask]
-    return mat_int
 """
 結晶系ごとに点群をまとめて返す補助関数群
 三斜晶, 単斜晶, 斜方晶, 正方晶, 三方晶, 六方晶, 立方晶
@@ -531,35 +519,36 @@ def make_cubic(cell=None):
         [0, 1, 0],
         [0, 0, 1],
     ]
+    sqrt3 = np.sqrt(3)
     # 3C2: xyz軸, 8C3: 4本の三重軸ごとに±120度
     point_groups["T"] = {
         "E  E": identity(),
         **{
-            f"8C3  C3({i+1})": to_integer_rotation_matrix(rotation_matrix_axis(np.array(axis), 120, cell))
+            f"8C3  C3({i+1})": rotation_matrix_axis(np.array(axis) / sqrt3, 120, cell)
             for i, axis in enumerate(c3_axes)
         },
         **{
-            f"8C3  C3^2({i+1})": to_integer_rotation_matrix(rotation_matrix_axis(np.array(axis), 240, cell))
+            f"8C3  C3^2({i+1})": rotation_matrix_axis(np.array(axis) / sqrt3, 240, cell)
             for i, axis in enumerate(c3_axes)
         },
-        "3C2  C2(x)": to_integer_rotation_matrix(rotation_matrix("x", 180, cell)),
-        "3C2  C2(y)": to_integer_rotation_matrix(rotation_matrix("y", 180, cell)),
-        "3C2  C2(z)": to_integer_rotation_matrix(rotation_matrix("z", 180, cell)),
+        "3C2  C2(x)": rotation_matrix("x", 180, cell),
+        "3C2  C2(y)": rotation_matrix("y", 180, cell),
+        "3C2  C2(z)": rotation_matrix("z", 180, cell),
     }
     # Th (T＋反転)
     point_groups["Th"] = {
         "E  E": identity(),
         **{
-            f"8C3  C3({i+1})": to_integer_rotation_matrix(rotation_matrix_axis(np.array(axis), 120, cell))
+            f"8C3  C3({i+1})": rotation_matrix_axis(np.array(axis) / sqrt3, 120, cell)
             for i, axis in enumerate(c3_axes)
         },
         **{
-            f"8C3  C3^2({i+1})": to_integer_rotation_matrix(rotation_matrix_axis(np.array(axis), 240, cell))
+            f"8C3  C3^2({i+1})": rotation_matrix_axis(np.array(axis) / sqrt3, 240, cell)
             for i, axis in enumerate(c3_axes)
         },
-        "3C2  C2(x)": to_integer_rotation_matrix(rotation_matrix("x", 180, cell)),
-        "3C2  C2(y)": to_integer_rotation_matrix(rotation_matrix("y", 180, cell)),
-        "3C2  C2(z)": to_integer_rotation_matrix(rotation_matrix("z", 180, cell)),
+        "3C2  C2(x)": rotation_matrix("x", 180, cell),
+        "3C2  C2(y)": rotation_matrix("y", 180, cell),
+        "3C2  C2(z)": rotation_matrix("z", 180, cell),
         "i  I": inversion(cell),
     }
     # O (四重回転＋三重回転＋2回回転)
@@ -567,28 +556,41 @@ def make_cubic(cell=None):
     point_groups["O"] = {
         "E  E": identity(),
         **{
-            f"8C3  C3({i+1})": to_integer_rotation_matrix(rotation_matrix_axis(np.array(axis), 120, cell))
+            f"8C3  C3({i+1})": rotation_matrix_axis(np.array(axis) / sqrt3, 120, cell)
             for i, axis in enumerate(c3_axes)
         },
         **{
-            f"8C3  C3^2({i+1})": to_integer_rotation_matrix(rotation_matrix_axis(np.array(axis), 240, cell))
+            f"8C3  C3^2({i+1})": rotation_matrix_axis(np.array(axis) / sqrt3, 240, cell)
             for i, axis in enumerate(c3_axes)
         },
-        "6C2  C2(x)": to_integer_rotation_matrix(rotation_matrix("x", 180, cell)),
-        "6C2  C2(y)": to_integer_rotation_matrix(rotation_matrix("y", 180, cell)),
-        "6C2  C2(z)": to_integer_rotation_matrix(rotation_matrix("z", 180, cell)),
-        "6C4  C4(x)": to_integer_rotation_matrix(rotation_matrix("x", 90, cell)),
-        "6C4  C4^3(x)": to_integer_rotation_matrix(rotation_matrix("x", 270, cell)),
-        "6C4  C4(y)": to_integer_rotation_matrix(rotation_matrix("y", 90, cell)),
-        "6C4  C4^3(y)": to_integer_rotation_matrix(rotation_matrix("y", 270, cell)),
-        "6C4  C4(z)": to_integer_rotation_matrix(rotation_matrix("z", 90, cell)),
-        "6C4  C4^3(z)": to_integer_rotation_matrix(rotation_matrix("z", 270, cell)),
+        "6C2  C2(x)": rotation_matrix("x", 180, cell),
+        "6C2  C2(y)": rotation_matrix("y", 180, cell),
+        "6C2  C2(z)": rotation_matrix("z", 180, cell),
+        "6C4  C4(x)": rotation_matrix("x", 90, cell),
+        "6C4  C4^3(x)": rotation_matrix("x", 270, cell),
+        "6C4  C4(y)": rotation_matrix("y", 90, cell),
+        "6C4  C4^3(y)": rotation_matrix("y", 270, cell),
+        "6C4  C4(z)": rotation_matrix("z", 90, cell),
+        "6C4  C4^3(z)": rotation_matrix("z", 270, cell),
     }
     # Td (T＋鏡映)
     # 8C3: 4本の三重軸(立方体の対角線)ごとに±120度
     # 3C2: xyz軸
     # 6S4: xyz軸ごとに±90度の不正回転
     # 6sigmad: 立方体の対角面
+    sqrt2 = np.sqrt(2)
+    sqrt3 = np.sqrt(3)
+    c3_axes = [
+        [1, 1, 1],
+        [-1, 1, 1],
+        [1, -1, 1],
+        [1, 1, -1],
+    ]
+    c2_axes = [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1],
+    ]
     sigmad_axes = [
         [1, 1, 0],
         [1, -1, 0],
@@ -601,27 +603,29 @@ def make_cubic(cell=None):
         "E  E": identity(),
         # 8C3
         **{
-            f"8C3  C3({i+1})": to_integer_rotation_matrix(rotation_matrix_axis(np.array(axis), 120, cell))
+            f"8C3  C3({i+1})": rotation_matrix_axis(np.array(axis) / sqrt3, 120, cell)
             for i, axis in enumerate(c3_axes)
         },
         **{
-            f"8C3  C3^2({i+1})": to_integer_rotation_matrix(rotation_matrix_axis(np.array(axis), 240, cell))
+            f"8C3  C3^2({i+1})": rotation_matrix_axis(np.array(axis) / sqrt3, 240, cell)
             for i, axis in enumerate(c3_axes)
         },
         # 3C2
-        "3C2  C2(x)": to_integer_rotation_matrix(rotation_matrix("x", 180, cell)),
-        "3C2  C2(y)": to_integer_rotation_matrix(rotation_matrix("y", 180, cell)),
-        "3C2  C2(z)": to_integer_rotation_matrix(rotation_matrix("z", 180, cell)),
+        "3C2  C2(x)": rotation_matrix("x", 180, cell),
+        "3C2  C2(y)": rotation_matrix("y", 180, cell),
+        "3C2  C2(z)": rotation_matrix("z", 180, cell),
         # 6S4
-        "6S4  S4(x)": to_integer_rotation_matrix(improper_rotation_matrix("x", 90, cell)),
-        "6S4  S4^3(x)": to_integer_rotation_matrix(improper_rotation_matrix("x", 270, cell)),
-        "6S4  S4(y)": to_integer_rotation_matrix(improper_rotation_matrix("y", 90, cell)),
-        "6S4  S4^3(y)": to_integer_rotation_matrix(improper_rotation_matrix("y", 270, cell)),
-        "6S4  S4(z)": to_integer_rotation_matrix(improper_rotation_matrix("z", 90, cell)),
-        "6S4  S4^3(z)": to_integer_rotation_matrix(improper_rotation_matrix("z", 270, cell)),
+        "6S4  S4(x)": improper_rotation_matrix("x", 90, cell),
+        "6S4  S4^3(x)": improper_rotation_matrix("x", 270, cell),
+        "6S4  S4(y)": improper_rotation_matrix("y", 90, cell),
+        "6S4  S4^3(y)": improper_rotation_matrix("y", 270, cell),
+        "6S4  S4(z)": improper_rotation_matrix("z", 90, cell),
+        "6S4  S4^3(z)": improper_rotation_matrix("z", 270, cell),
         # 6sigmad
         **{
-            f"6sigmad  sigmad({i+1})": to_integer_rotation_matrix(reflection_matrix_axis(np.array(axis), cell))
+            f"6sigmad  sigmad({i+1})": reflection_matrix_axis(
+                np.array(axis) / np.linalg.norm(axis), cell
+            )
             for i, axis in enumerate(sigmad_axes)
         },
     }
@@ -635,62 +639,91 @@ def make_cubic(cell=None):
     # 8S6: 4本の三重軸ごとに±60度の不正回転
     # 3sigmah: xy, yz, zx
     # 6sigmad: 立方体の対角面
+    sqrt2 = np.sqrt(2)
+    sqrt3 = np.sqrt(3)
     # 三重軸(立方体の対角線)
-    # c3_axes, c2_axes, sigmad_axesは上で定義済み
+    c3_axes = [
+        [1, 1, 1],
+        [-1, 1, 1],
+        [1, -1, 1],
+        [1, 1, -1],
+    ]
+    # 面心を結ぶC2軸
+    c2_axes = [[0, 1, 1], [0, -1, 1], [1, 0, 1], [-1, 0, 1], [1, 1, 0], [1, -1, 0]]
+    # 対角面の法線
+    sigmad_axes = [
+        [1, 1, 0],
+        [1, -1, 0],
+        [1, 0, 1],
+        [1, 0, -1],
+        [0, 1, 1],
+        [0, 1, -1],
+    ]
+    # S6軸(三重軸と同じ)
     s6_axes = c3_axes
+    # S4軸(四重軸と同じ)
+    # s4_axes = ... 未使用のため削除
+    # 四重軸
+    # c4_axes, c2_main_axes, sigmah_planes は未使用のため削除
     point_groups["Oh"] = {
         # 単位元
         "E  E": identity(),
         # 8C3
         **{
-            f"8C3  C3({i+1})": to_integer_rotation_matrix(rotation_matrix_axis(np.array(axis), 120, cell))
+            f"8C3  C3({i+1})": rotation_matrix_axis(np.array(axis) / sqrt3, 120, cell)
             for i, axis in enumerate(c3_axes)
         },
         **{
-            f"8C3  C3^2({i+1})": to_integer_rotation_matrix(rotation_matrix_axis(np.array(axis), 240, cell))
+            f"8C3  C3^2({i+1})": rotation_matrix_axis(np.array(axis) / sqrt3, 240, cell)
             for i, axis in enumerate(c3_axes)
         },
         # 6C2 (xyz)
-        "6C2  C2(x)": to_integer_rotation_matrix(rotation_matrix("x", 180, cell)),
-        "6C2  C2(y)": to_integer_rotation_matrix(rotation_matrix("y", 180, cell)),
-        "6C2  C2(z)": to_integer_rotation_matrix(rotation_matrix("z", 180, cell)),
+        "6C2  C2(x)": rotation_matrix("x", 180, cell),
+        "6C2  C2(y)": rotation_matrix("y", 180, cell),
+        "6C2  C2(z)": rotation_matrix("z", 180, cell),
         # 6C4 (xyz)
-        "6C4  C4(x)": to_integer_rotation_matrix(rotation_matrix("x", 90, cell)),
-        "6C4  C4^3(x)": to_integer_rotation_matrix(rotation_matrix("x", 270, cell)),
-        "6C4  C4(y)": to_integer_rotation_matrix(rotation_matrix("y", 90, cell)),
-        "6C4  C4^3(y)": to_integer_rotation_matrix(rotation_matrix("y", 270, cell)),
-        "6C4  C4(z)": to_integer_rotation_matrix(rotation_matrix("z", 90, cell)),
-        "6C4  C4^3(z)": to_integer_rotation_matrix(rotation_matrix("z", 270, cell)),
+        "6C4  C4(x)": rotation_matrix("x", 90, cell),
+        "6C4  C4^3(x)": rotation_matrix("x", 270, cell),
+        "6C4  C4(y)": rotation_matrix("y", 90, cell),
+        "6C4  C4^3(y)": rotation_matrix("y", 270, cell),
+        "6C4  C4(z)": rotation_matrix("z", 90, cell),
+        "6C4  C4^3(z)": rotation_matrix("z", 270, cell),
         # 3C2 (面心)
         **{
-            f"3C2  C2(f{i+1})": to_integer_rotation_matrix(rotation_matrix_axis(np.array(axis), 180, cell))
+            f"3C2  C2(f{i+1})": rotation_matrix_axis(np.array(axis) / sqrt2, 180, cell)
             for i, axis in enumerate(c2_axes)
         },
         # 反転
         "i  I": inversion(cell),
         # 6S4 (xyz)
-        "6S4  S4(x)": to_integer_rotation_matrix(improper_rotation_matrix("x", 90, cell)),
-        "6S4  S4^3(x)": to_integer_rotation_matrix(improper_rotation_matrix("x", 270, cell)),
-        "6S4  S4(y)": to_integer_rotation_matrix(improper_rotation_matrix("y", 90, cell)),
-        "6S4  S4^3(y)": to_integer_rotation_matrix(improper_rotation_matrix("y", 270, cell)),
-        "6S4  S4(z)": to_integer_rotation_matrix(improper_rotation_matrix("z", 90, cell)),
-        "6S4  S4^3(z)": to_integer_rotation_matrix(improper_rotation_matrix("z", 270, cell)),
+        "6S4  S4(x)": improper_rotation_matrix("x", 90, cell),
+        "6S4  S4^3(x)": improper_rotation_matrix("x", 270, cell),
+        "6S4  S4(y)": improper_rotation_matrix("y", 90, cell),
+        "6S4  S4^3(y)": improper_rotation_matrix("y", 270, cell),
+        "6S4  S4(z)": improper_rotation_matrix("z", 90, cell),
+        "6S4  S4^3(z)": improper_rotation_matrix("z", 270, cell),
         # 8S6 (三重軸)
         **{
-            f"8S6  S6({i+1})": to_integer_rotation_matrix(improper_rotation_matrix_axis(np.array(axis), 60, cell))
+            f"8S6  S6({i+1})": improper_rotation_matrix_axis(
+                axis / np.linalg.norm(axis), 60, cell
+            )
             for i, axis in enumerate(s6_axes)
         },
         **{
-            f"8S6  S6^5({i+1})": to_integer_rotation_matrix(improper_rotation_matrix_axis(np.array(axis), 300, cell))
+            f"8S6  S6^5({i+1})": improper_rotation_matrix_axis(
+                axis / np.linalg.norm(axis), 300, cell
+            )
             for i, axis in enumerate(s6_axes)
         },
         # 3sigmah
-        "3sigmah  sigmah(xy)": to_integer_rotation_matrix(reflection_matrix("xy", cell)),
-        "3sigmah  sigmah(yz)": to_integer_rotation_matrix(reflection_matrix("yz", cell)),
-        "3sigmah  sigmah(xz)": to_integer_rotation_matrix(reflection_matrix("xz", cell)),
+        "3sigmah  sigmah(xy)": reflection_matrix("xy", cell),
+        "3sigmah  sigmah(yz)": reflection_matrix("yz", cell),
+        "3sigmah  sigmah(xz)": reflection_matrix("xz", cell),
         # 6sigmad (対角面)
         **{
-            f"6sigmad  sigmad({i+1})": to_integer_rotation_matrix(reflection_matrix_axis(np.array(axis), cell))
+            f"6sigmad  sigmad({i+1})": reflection_matrix_axis(
+                np.array(axis) / np.linalg.norm(axis), cell
+            )
             for i, axis in enumerate(sigmad_axes)
         },
     }

@@ -5,12 +5,12 @@ from .sym_op import (
     apply_sym_single,
     apply_for_orb,
     check_symmetry,
+    check_symmetry2
 )
 import numpy as np
 from .pglib import tr2o3
 from .schonflies import point_group_map
 from .utils import logger
-
 
 class GetCharacter:
     """
@@ -40,6 +40,7 @@ class GetCharacter:
         self.tbcell = self.tbmodel.cell
         self.site_species = self.tbmodel.site_species
         self.site_nlm = self.tbmodel.site_nlm
+        self.use_trace = True
 
     def _gen_space_group(self):
         """
@@ -175,7 +176,10 @@ class GetCharacter:
             result = apply_for_orb(amps, rot, trs)
             logger.info(f"before: {amps}")
             logger.info(f"after: {result}")
-            charcter = check_symmetry(amps, result)
+            if self.use_trace:
+                charcter = check_symmetry2(amps, result)
+            else:
+                charcter = check_symmetry(amps, result)
             logger.info(f"character: {charcter}")
             return charcter
 

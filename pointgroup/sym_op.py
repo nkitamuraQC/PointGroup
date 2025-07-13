@@ -59,4 +59,38 @@ def check_symmetry(amps_dict, transformed_dict, cell=None, tol=1e-6):
                         break
 
     return flag
+
+
+def check_symmetry2(amps_dict, transformed_dict, cell=None, tol=1e-6):
+    mat = np.zeros((len(amps_dict), len(amps_dict)))
+    count1 = 0
+    count2 = 0
+    for k1, amp1 in amps_dict.items():
+        k1 = np.array(k1)
+        for k2, amp2 in transformed_dict.items():
+            k2 = np.array(k2)
+            all_pos = get_diff(k2.copy(), cell)
+            elem = get_matelem(all_pos, k1, amp1, amp2)
+            mat[count1, count2] = elem
+            count2 += 1
+        count1 += 1 
+        count2 = 0  
+    print(mat) 
+    return np.trace(mat)
         
+
+def get_matelem(all_pos, k1, amp1, amp2, tol=1e-6):
+    flag = 0
+    for pos in all_pos:
+        # print(k1, pos)
+        if np.linalg.norm(k1 - pos) < tol:
+            if abs(amp1 + amp2) < tol:
+                flag = -1
+                break
+            elif abs(amp1 - amp2) < tol:
+                flag = 1
+                break
+            else:
+                flag = 0
+                break
+    return flag

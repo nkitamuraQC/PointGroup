@@ -40,15 +40,20 @@ def test_overall():
     n = gcclass._get_symm_ops()
     res = []
     for i in range(n):
-        ch = gcclass.get_character(kidx=0, orb_idx=0, op_idx=i)
+        ch = gcclass.get_character(kidx=0, orb_idx=1, op_idx=i)
         res.append(ch)
     print(res.count(1))
     print(res.count(-1))
     ir = GetIR(gcclass)
     h = ir._get_h()
-    ch = np.ones((h))
-    w_ch = ir.reduce_ir(ch, ir_idx=0)
-    print(w_ch)
+    nir = ir._get_ir()
+    ch = np.array(res)
+    w_chs = []
+    for i in range(nir):
+        w_ch = ir.reduce_ir(ch, ir_idx=i)
+        w_chs.append(w_ch)
+    print(w_chs)
+
 
     # salc = GetSALC(gcclass)
     # w = salc.make_salc_site(sym_idx=0)
@@ -81,22 +86,38 @@ def test_overall2():
 
     gcclass = GetCharacter(tb)
     n = gcclass._get_symm_ops()
-    res = []
+    res1 = []
     for i in range(n):
         ch = gcclass.get_character(kidx=0, orb_idx=0, op_idx=i)
-        res.append(ch)
-    print(res.count(1))
-    print(res.count(-1))
+        res1.append(ch)
+    
+    res2 = []
+    for i in range(n):
+        ch = gcclass.get_character(kidx=0, orb_idx=1, op_idx=i)
+        res2.append(ch)
+    print(res1)
+    print(res1.count(1))
+    print(res1.count(-1))
+    print(res1.count(2))
+    print()
+    print(res2)
+    print(res2.count(1))
+    print(res2.count(-1))
+    print(res2.count(2))
     ir = GetIR(gcclass)
     h = ir._get_h()
-    ch = np.ones((h))
-    w_ch = ir.reduce_ir(ch, ir_idx=0)
-    print(w_ch)
+    nir = ir._get_ir()
+    ch = np.array(res1)
+    w_chs = []
+    for i in range(nir):
+        w_ch = ir.reduce_ir(ch, ir_idx=i)
+        w_chs.append(w_ch)
+    print(w_chs)
 
-    salc = GetSALC(gcclass)
-    for i in range(12):
-        w = salc.make_salc_site(sym_idx=i)
-        print(w)
+    # salc = GetSALC(gcclass)
+    # for i in range(12):
+    #     w = salc.make_salc_site(sym_idx=i)
+    #     print(w)
     return
 
 def test_overall3():
@@ -138,9 +159,14 @@ def test_overall3():
     print(res.count(-1))
     ir = GetIR(gcclass)
     h = ir._get_h()
-    ch = np.ones((h))
-    w_ch = ir.reduce_ir(ch, ir_idx=0)
-    print(w_ch)
+    nir = ir._get_ir()
+    ch = np.array(res)
+    w_chs = []
+    for i in range(nir):
+        w_ch = ir.reduce_ir(ch, ir_idx=i)
+        w_chs.append(w_ch)
+    print(w_chs)
+
 
     # salc = GetSALC(gcclass)
     # w = salc.make_salc_site(sym_idx=0)
@@ -149,6 +175,6 @@ def test_overall3():
 
 
 if __name__ == "__main__":
-    #test_overall()
-    test_overall2()
+    test_overall()
+    # test_overall2()
     # test_overall3()
