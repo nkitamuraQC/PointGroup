@@ -83,7 +83,7 @@ def test_overall2():
     n = gcclass._get_symm_ops()
     res = []
     for i in range(n):
-        ch = gcclass.get_character(kidx=0, orb_idx=1, op_idx=i)
+        ch = gcclass.get_character(kidx=0, orb_idx=0, op_idx=i)
         res.append(ch)
     print(res.count(1))
     print(res.count(-1))
@@ -149,6 +149,6 @@ def test_overall3():
 
 
 if __name__ == "__main__":
-    test_overall()
-    # test_overall2()
+    #test_overall()
+    test_overall2()
     # test_overall3()
