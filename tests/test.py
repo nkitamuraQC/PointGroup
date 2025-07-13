@@ -57,18 +57,20 @@ def test_overall2():
     n = gcclass._get_symm_ops()
     res = []
     for i in range(n):
-        ch = gcclass.get_character(kidx=0, orb_idx=0, op_idx=i)
+        ch = gcclass.get_character(kidx=0, orb_idx=1, op_idx=i)
         res.append(ch)
     print(res.count(1))
     print(res.count(-1))
     ir = GetIR(gcclass)
     h = ir._get_h()
     ch = np.ones((h))
-    ir.reduce_ir(ch, ir_idx=0)
+    w_ch = ir.reduce_ir(ch, ir_idx=0)
+    print(w_ch)
 
     salc = GetSALC(gcclass)
-    w = salc.make_salc_site(sym_idx=0)
-    print(w)
+    for i in range(12):
+        w = salc.make_salc_site(sym_idx=i)
+        print(w)
     return
 
 

@@ -398,38 +398,69 @@ def make_hexagonal(cell=None):
         "sigmav6  sigmav6": reflection_matrix_axis(sigmav6_axis, cell),
     }
 
-    # D6h (6回回転＋2回回転×6＋水平鏡映＋鏡映×6＋反転) - 完全版
+    # D6h (6回回転＋2回回転×6＋反転＋鏡映×7)
+    # z軸: C6, C3, C2, S3, S6, σh
+    # 3C2': x, y, -x-y軸
+    # 3C2'': x', y', z'軸 (x'=x+y, y'=y-x, z'=z)
+    # 3σd: C2'軸を含む面, 3σv: C2''軸を含む面
+    sqrt3 = np.sqrt(3)
+    # C2'軸
+    c2p_axes = [
+        [1, 0, 0],
+        [-0.5, sqrt3/2, 0],
+        [-0.5, -sqrt3/2, 0],
+    ]
+    # C2''軸
+    c2pp_axes = [
+        [0, 1, 0],
+        [sqrt3/2, 0.5, 0],
+        [-sqrt3/2, 0.5, 0],
+    ]
+    # σd面法線（C2'軸とz軸の中間）
+    sigmad_axes = [
+        np.array([1, 0, 0]) + np.array([0, 0, 1]),
+        np.array([-0.5, sqrt3/2, 0]) + np.array([0, 0, 1]),
+        np.array([-0.5, -sqrt3/2, 0]) + np.array([0, 0, 1]),
+    ]
+    # σv面法線（C2''軸とz軸の中間）
+    sigmav_axes = [
+        np.array([0, 1, 0]) + np.array([0, 0, 1]),
+        np.array([sqrt3/2, 0.5, 0]) + np.array([0, 0, 1]),
+        np.array([-sqrt3/2, 0.5, 0]) + np.array([0, 0, 1]),
+    ]
     point_groups["D6h"] = {
         "E  E": identity(),
-        "C6  C6": rotation_matrix("z", 60, cell),
-        "C6_2  C6^2": rotation_matrix("z", 120, cell),
-        "C6_3  C6^3": rotation_matrix("z", 180, cell),
-        "C6_4  C6^4": rotation_matrix("z", 240, cell),
-        "C6_5  C6^5": rotation_matrix("z", 300, cell),
-        "C2x  C2(x)": rotation_matrix("x", 180, cell),
-        "C2y  C2(y)": rotation_matrix("y", 180, cell),
-        "C2_1  C2(1)": rotation_matrix_axis([1, 1, 0], 180, cell),
-        "C2_2  C2(2)": rotation_matrix_axis([1, -1, 0], 180, cell),
-        "C2_3  C2(3)": rotation_matrix_axis([np.sqrt(3) / 2, 1 / 2, 0], 180, cell),
-        "C2_4  C2(4)": rotation_matrix_axis([np.sqrt(3) / 2, -1 / 2, 0], 180, cell),
+        "2C6  C6(z)": rotation_matrix("z", 60, cell),
+        "2C6  C6^5(z)": rotation_matrix("z", 300, cell),
+        "2C3  C3(z)": rotation_matrix("z", 120, cell),
+        "2C3  C3^2(z)": rotation_matrix("z", 240, cell),
+        "C2  C2(z)": rotation_matrix("z", 180, cell),
+        # 3C2'
+        **{
+            f"3C2_1  C2'({i+1})": rotation_matrix_axis(np.array(axis), 180, cell)
+            for i, axis in enumerate(c2p_axes)
+        },
+        # 3C2''
+        **{
+            f"3C2_2  C2''({i+1})": rotation_matrix_axis(np.array(axis), 180, cell)
+            for i, axis in enumerate(c2pp_axes)
+        },
         "i  I": inversion(cell),
-        "S3  S3": improper_rotation_matrix("z", 120, cell),
-        "S3_5  S3^5": improper_rotation_matrix("z", 240, cell),
-        "S6  S6": improper_rotation_matrix("z", 60, cell),
-        "S6_5  S6^5": improper_rotation_matrix("z", 300, cell),
-        "sigmah  sigmah": reflection_matrix("xy", cell),
-        "sigmav1  sigmav1": reflection_matrix_axis(sigmav1_axis, cell),
-        "sigmav2  sigmav2": reflection_matrix_axis(sigmav2_axis, cell),
-        "sigmav3  sigmav3": reflection_matrix_axis(sigmav3_axis, cell),
-        "sigmav4  sigmav4": reflection_matrix_axis(sigmav4_axis, cell),
-        "sigmav5  sigmav5": reflection_matrix_axis(sigmav5_axis, cell),
-        "sigmav6  sigmav6": reflection_matrix_axis(sigmav6_axis, cell),
-        "sigmad1  sigmad1": reflection_matrix_axis([1, 1, 0], cell),  # 対角鏡映面
-        "sigmad2  sigmad2": reflection_matrix_axis([1, -1, 0], cell),
-        "sigmad3  sigmad3": reflection_matrix_axis([np.sqrt(3) / 2, 1 / 2, 0], cell),
-        "sigmad4  sigmad4": reflection_matrix_axis([np.sqrt(3) / 2, -1 / 2, 0], cell),
-        "sigmad5  sigmad5": reflection_matrix_axis([-np.sqrt(3) / 2, 1 / 2, 0], cell),
-        "sigmad6  sigmad6": reflection_matrix_axis([-np.sqrt(3) / 2, -1 / 2, 0], cell),
+        "2S3  S3(z)": improper_rotation_matrix("z", 120, cell),
+        "2S3  S3^2(z)": improper_rotation_matrix("z", 240, cell),
+        "2S6  S6(z)": improper_rotation_matrix("z", 60, cell),
+        "2S6  S6^5(z)": improper_rotation_matrix("z", 300, cell),
+        "sigmah  sigmah(xy)": reflection_matrix("xy", cell),
+        # 3σd
+        **{
+            f"3sigmad  sigmad({i+1})": reflection_matrix_axis(axis/np.linalg.norm(axis), cell)
+            for i, axis in enumerate(sigmad_axes)
+        },
+        # 3σv
+        **{
+            f"3sigmav  sigmav({i+1})": reflection_matrix_axis(axis/np.linalg.norm(axis), cell)
+            for i, axis in enumerate(sigmav_axes)
+        },
     }
 
     # 他の重要な点群も追加
