@@ -11,12 +11,14 @@ from .pglib import tr2o3
 from .schonflies import point_group_map
 from .utils import logger
 
+
 class GetCharacter:
     """
     Tight-bindingモデルから点群・空間群のキャラクター（指標）を計算するためのユーティリティクラス。
     spglibによる対称操作取得、軌道・サイトごとのアンプリチュード取得、
     およびキャラクター計算のための補助関数を提供する。
     """
+
     def __init__(self, tbmodel: TBModel):
         """
         Parameters
@@ -33,6 +35,7 @@ class GetCharacter:
         self.trans = None
         self.Umat = tbmodel.Umat  # site, k, band
         self.dataset = None
+        self.nsymm_ops = 0
         self.pos = self.tbmodel.pos  # nsite, ndim
         self.tbcell = self.tbmodel.cell
         self.site_species = self.tbmodel.site_species
@@ -47,7 +50,7 @@ class GetCharacter:
             self.dataset = spglib.spglib.get_symmetry_dataset(cell)
         self.spg = self.dataset["international"]
         return
-    
+
     def _gen_point_group(self):
         """
         spglibを用いて点群（point group symbol）を取得し、self.pgに格納する。
@@ -57,7 +60,7 @@ class GetCharacter:
             self.dataset = spglib.spglib.get_symmetry_dataset(cell)
         self.pg = self.dataset["pointgroup"]
         return
-    
+
     def _get_symm_ops(self):
         """
         spglibを用いて全対称操作（回転・並進）を取得し、
@@ -67,13 +70,13 @@ class GetCharacter:
         self.symm_ops = spglib.spglib.get_symmetry(cell)
         self.rot = self.symm_ops["rotations"]
         self.trans = self.symm_ops["translations"]
-        
+
         self.rot_o3 = np.zeros_like(self.rot)
         for i in range(self.rot_o3.shape[0]):
             R = self.rot[i, :, :]
             self.rot_o3[i, :, :] = tr2o3(self.tbcell, R)
-        return
-    
+        return self.rot.shape[0]
+
     def _get_site_amps(self, kidx, orb_idx):
         """
         指定したk点・バンドのサイトごとのアンプリチュード（波動関数成分）を取得する。
@@ -126,13 +129,13 @@ class GetCharacter:
         グリッド上のアンプリチュード（波動関数成分）を取得する（未実装）。
         """
         raise NotImplementedError
-    
+
     def get_ch_occnum_vector(self):
         """
         キャラクターの占有数ベクトルを返す（未実装）。
         """
         raise NotImplementedError
-    
+
     def get_character(self, kidx=0, orb_idx=0, op_idx=0, mode="site"):
         """
         指定したk点・バンド・対称操作に対するキャラクター（指標）を計算する。
@@ -162,7 +165,7 @@ class GetCharacter:
             amps = self._get_grid_amps(kidx, orb_idx)
         else:
             raise NotImplementedError
-        
+
         rot = self.rot[op_idx]
         trs = self.trans[op_idx]
         logger.info(f"pg: {point_group_map[self.pg]}")
@@ -173,11 +176,10 @@ class GetCharacter:
             logger.info(f"before: {amps}")
             logger.info(f"after: {result}")
             charcter = check_symmetry(amps, result)
+            logger.info(f"character: {charcter}")
             return charcter
-            
 
         elif mode == "grid":
             raise NotImplementedError
         else:
             raise NotImplementedError
-    

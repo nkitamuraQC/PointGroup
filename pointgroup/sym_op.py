@@ -1,14 +1,19 @@
 import numpy as np
 
-def apply_sym_for_all(pos: np.ndarray, rot: np.ndarray, trans: np.ndarray): ## nsite, x, y, z
+
+def apply_sym_for_all(
+    pos: np.ndarray, rot: np.ndarray, trans: np.ndarray
+):  ## nsite, x, y, z
     return (np.dot(rot, pos.T) + trans).T
 
 
-def apply_sym_single(pos: np.ndarray, rot: np.ndarray, trans: np.ndarray): ## nsite, x, y, z
+def apply_sym_single(
+    pos: np.ndarray, rot: np.ndarray, trans: np.ndarray
+):  ## nsite, x, y, z
     return np.dot(rot, pos) + trans
 
 
-def apply_for_orb(amps_dict: dict, rot, trs): ### dic[(x,y,z)] = amp
+def apply_for_orb(amps_dict: dict, rot, trs):  ### dic[(x,y,z)] = amp
     transformed = {}
     for k, v in amps_dict.items():
         x, y, z = k
@@ -18,6 +23,7 @@ def apply_for_orb(amps_dict: dict, rot, trs): ### dic[(x,y,z)] = amp
         x, y, z = new_coord
         transformed[(x, y, z)] = amp
     return transformed
+
 
 def check_symmetry(amps_dict, transformed_dict, tol=1e-6):
     results = []
@@ -43,4 +49,3 @@ def check_symmetry(amps_dict, transformed_dict, tol=1e-6):
         return -1
     else:
         return 0
-

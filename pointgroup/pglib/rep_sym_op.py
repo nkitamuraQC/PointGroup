@@ -1,4 +1,3 @@
-
 from scipy.spatial.transform import Rotation as R
 import numpy as np
 
@@ -10,6 +9,7 @@ from .transform import (
 from scipy.spatial.transform import Rotation as R
 
 ## cellの有無で変換をスイッチする
+
 
 def rotation_matrix_axis(axis_vec, angle_deg, cell=None):
     """
@@ -25,6 +25,7 @@ def rotation_matrix_axis(axis_vec, angle_deg, cell=None):
         rot = from_o3(cell, rot)
     return rot
 
+
 def reflection_matrix_axis(axis_vec, cell):
     n = np.asarray(axis_vec)
     n = n / np.linalg.norm(n)
@@ -32,6 +33,7 @@ def reflection_matrix_axis(axis_vec, cell):
     if cell is not None:
         rot = from_o3(cell, rot)
     return rot
+
 
 def identity():
     return np.identity(3)
@@ -44,36 +46,32 @@ def inversion(cell=None):
     return rot
 
 
-
 def rotation_matrix(axis, angle_deg, cell=None):
     angle_rad = np.radians(angle_deg)
     c, s = np.cos(angle_rad), np.sin(angle_rad)
-    if axis == 'x':
-        rot = np.array([[1, 0, 0],
-                        [0, c, -s],
-                        [0, s, c]])
-    elif axis == 'y':
-        rot = np.array([[c, 0, s],
-                         [0, 1, 0],
-                         [-s, 0, c]])
-    elif axis == 'z':
-        rot = np.array([[c, -s, 0],
-                         [s, c, 0],
-                         [0, 0, 1]])
+    if axis == "x":
+        rot = np.array([[1, 0, 0], [0, c, -s], [0, s, c]])
+    elif axis == "y":
+        rot = np.array([[c, 0, s], [0, 1, 0], [-s, 0, c]])
+    elif axis == "z":
+        rot = np.array([[c, -s, 0], [s, c, 0], [0, 0, 1]])
     if cell is not None:
         rot = from_o3(cell, rot)
     return rot
 
+
 def improper_rotation_matrix(axis, angle_deg, cell=None):
-    """ S_n = C_n followed by σh (mirror perpendicular to axis) """
-    rot = reflection_matrix({'x': 'yz', 'y': 'xz', 'z': 'xy'}[axis]) @ rotation_matrix(axis, angle_deg)
+    """S_n = C_n followed by σh (mirror perpendicular to axis)"""
+    rot = reflection_matrix({"x": "yz", "y": "xz", "z": "xy"}[axis]) @ rotation_matrix(
+        axis, angle_deg
+    )
     if cell is not None:
         rot = from_o3(cell, rot)
     return rot
 
 
 def improper_rotation_matrix_axis(axis, angle_deg, cell=None):
-    """ S_n = C_n followed by σh (mirror perpendicular to axis) """
+    """S_n = C_n followed by σh (mirror perpendicular to axis)"""
     rot = reflection_matrix_axis(axis, cell) @ rotation_matrix_axis(axis, angle_deg)
     if cell is not None:
         rot = from_o3(cell, rot)
@@ -81,13 +79,13 @@ def improper_rotation_matrix_axis(axis, angle_deg, cell=None):
 
 
 def reflection_matrix(plane, cell=None):
-    if plane == 'xy':
+    if plane == "xy":
         rot = np.diag([1, 1, -1])
-    elif plane == 'yz':
+    elif plane == "yz":
         rot = np.diag([-1, 1, 1])
-    elif plane == 'xz':
+    elif plane == "xz":
         rot = np.diag([1, -1, 1])
-    
+
     if cell is not None:
         rot = from_o3(cell, rot)
     return rot

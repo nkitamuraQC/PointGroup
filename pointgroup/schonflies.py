@@ -1,7 +1,7 @@
 ## internatinal -> schonflies
 point_group_map = {
     "1": "C1",
-    "-1": "Ci",            # または S1
+    "-1": "Ci",  # または S1
     "2": "C2",
     "m": "Cs",
     "2/m": "C2h",
@@ -16,7 +16,7 @@ point_group_map = {
     "-42m": "D2d",
     "4/mmm": "D4h",
     "3": "C3",
-    "-3": "S6",           # または S6
+    "-3": "S6",  # または S6
     "32": "D3",
     "3m": "C3v",
     "-3m": "D3d",
@@ -31,5 +31,5 @@ point_group_map = {
     "m3": "Th",
     "432": "O",
     "-43m": "Td",
-    "m-3m": "Oh"
+    "m-3m": "Oh",
 }

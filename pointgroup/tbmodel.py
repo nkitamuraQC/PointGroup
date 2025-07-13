@@ -2,20 +2,22 @@ from .pythtb_respack import w90, tb_model
 from seekpath import get_path
 import numpy as np
 
+
 class TBModel:
     """
     タイトバインディングモデル（Wannier90/pythtb/respack形式）をラップし、
     格子・軌道・バンド情報や対称k点経路などの生成・管理を行うクラス。
     """
+
     def __init__(
-        self, 
-        wannier_path: str = None, 
-        wannier_prefix: str = None, 
+        self,
+        wannier_path: str = None,
+        wannier_prefix: str = None,
         wannier_plot: str = None,
         nk: list = [4, 1, 1],
         site_species: list = [0],
-        site_nlm: list = [(1,0,0)],
-        pythtb_obj: tb_model = None
+        site_nlm: list = [(1, 0, 0)],
+        pythtb_obj: tb_model = None,
     ):
         """
         Parameters
@@ -46,7 +48,7 @@ class TBModel:
         self.pos = None
         self.Umat = None
         if pythtb_obj is not None:
-            assert(pythtb_obj._dim_r == 3)
+            assert pythtb_obj._dim_r == 3
 
         self.path_sym = None
         self.path_coord = None
@@ -61,7 +63,7 @@ class TBModel:
             バンドエネルギー配列
         """
         if self.pythtb_obj is None:
-           self.pythtb_obj = w90(self.path, self.prefix).model()
+            self.pythtb_obj = w90(self.path, self.prefix).model()
         self.cell = self.pythtb_obj._lat
         self.pos = self.pythtb_obj._orb
         # self.pos_with_corner = self._fill_corners()
@@ -79,14 +81,16 @@ class TBModel:
             if pos == [0, 0, 0]:
                 flag = True
         if flag:
-            self.pos.append((pos_arr+self.cell[0]).tolist())
-            self.pos.append((pos_arr+self.cell[1]).tolist())
-            self.pos.append((pos_arr+self.cell[2]).tolist())
-            self.pos.append((pos_arr+self.cell[0]+self.cell[1]).tolist())
-            self.pos.append((pos_arr+self.cell[0]+self.cell[1]+self.cell[2]).tolist())
-            
+            self.pos.append((pos_arr + self.cell[0]).tolist())
+            self.pos.append((pos_arr + self.cell[1]).tolist())
+            self.pos.append((pos_arr + self.cell[2]).tolist())
+            self.pos.append((pos_arr + self.cell[0] + self.cell[1]).tolist())
+            self.pos.append(
+                (pos_arr + self.cell[0] + self.cell[1] + self.cell[2]).tolist()
+            )
+
         return
-    
+
     def get_sym_kpts(self):
         """
         seekpathを用いて対称k点経路・座標を計算し、self.path, self.path_coord等に格納する。
@@ -97,8 +101,8 @@ class TBModel:
         struct = (cell, pos, n)
         res = get_path(struct)
         self.coord = res["point_coords"]
-        self.path = res['path']
-        
+        self.path = res["path"]
+
         path_sym = []
         for i, p in enumerate(self.path):
             path_sym.append(p[0])
@@ -111,15 +115,15 @@ class TBModel:
 
         self.path_coord = path_coord
         self.path_sym = path_sym
-        return 
-    
+        return
+
     def _get_uniform_kpts(self):
         """
         一様k点メッシュをpythtbから取得しself.kptsに格納する。
         """
         self.kpts = self.pythtb_obj.k_uniform_mesh(self.nk)
         return
-    
+
     def _get_bands(self):
         """
         全k点でバンド計算を行い、固有ベクトル（波動関数）をself.Umatに格納する。
@@ -131,5 +135,3 @@ class TBModel:
         (eval, evec) = self.pythtb_obj.solve_all(self.kpts, eig_vectors=True)
         self.Umat = evec
         return eval
-    
-

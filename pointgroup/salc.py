@@ -1,10 +1,9 @@
 from .get_character import GetCharacter
 from .schonflies import point_group_map
 from .pglib import point_group, get_rep
-from .sym_op import (
-    apply_for_orb
-)
+from .sym_op import apply_for_orb
 import numpy as np
+
 
 class GetSALC:
     """
@@ -12,6 +11,7 @@ class GetSALC:
     GetCharacterインスタンスから点群情報・座標・対称操作を受け取り、
     サイトごとのSALCや重み計算を行う。
     """
+
     def __init__(self, getc: GetCharacter):
         """
         Parameters
@@ -57,7 +57,7 @@ class GetSALC:
             if np.linalg.norm(diff) < 1e-6:
                 return rep_name
         return None
-    
+
     def make_salc_site(self, sym_idx=0):
         """
         指定した対称操作インデックスに対するSALC重みを計算する。
@@ -98,8 +98,3 @@ class GetSALC:
         SALC基底でのハミルトニアンを返す（未実装）。
         """
         raise NotImplementedError
-
-
-
-
-
