@@ -40,7 +40,7 @@ def test_overall():
     n = gcclass._get_symm_ops()
     res = []
     for i in range(n):
-        ch = gcclass.get_character(kidx=0, orb_idx=1, op_idx=i)
+        ch = gcclass.get_character(kidx=0, orb_idx=0, op_idx=i)
         res.append(ch)
     print(res.count(1))
     print(res.count(-1))
@@ -114,7 +114,7 @@ def test_overall3():
     t=0.6
     
     # set on-site energies
-    my_model.set_onsite([-delta,delta])
+    my_model.set_onsite([delta,delta])
     # set hoppings (one for each connected pair of orbitals)
     # (amplitude, i, j, [lattice vector to cell containing j])
     my_model.set_hop(t, 1, 0, [0, 0, 0])
@@ -149,6 +149,6 @@ def test_overall3():
 
 
 if __name__ == "__main__":
-    # test_overall()
+    test_overall()
     # test_overall2()
-    test_overall3()
+    # test_overall3()
