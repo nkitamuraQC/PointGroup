@@ -87,7 +87,7 @@ def classify_symmetry_operation(matrix, principal_axis='z'):
                 if axis_name == principal_axis:
                     return f"C2", f"180° rotation around principal {axis_name}-axis"
                 else:
-                    return f"C2'({axis_name})", f"180° rotation around {axis_name}-axis (perpendicular to principal axis)"
+                    return f"C2({axis_name})", f"180° rotation around {axis_name}-axis (perpendicular to principal axis)"
             elif abs(angle - 120) < 1e-6:
                 return f"C3({axis_name})", f"120° rotation around {axis_name}-axis"
             elif abs(angle - 90) < 1e-6:
@@ -110,25 +110,25 @@ def classify_symmetry_operation(matrix, principal_axis='z'):
                 # 主回転軸との関係で分類
                 if main_idx == 0:  # x方向が法線 → yz面
                     if principal_axis == 'x':
-                        return "σh(yz)", "Horizontal mirror plane (yz-plane)"
+                        return "sigmah(yz)", "Horizontal mirror plane (yz-plane)"
                     else:
-                        return "σv(yz)", "Vertical mirror plane (yz-plane)"
+                        return "sigmav(yz)", "Vertical mirror plane (yz-plane)"
                 elif main_idx == 1:  # y方向が法線 → xz面
                     if principal_axis == 'y':
-                        return "σh(xz)", "Horizontal mirror plane (xz-plane)"
+                        return "sigmah(xz)", "Horizontal mirror plane (xz-plane)"
                     else:
-                        return "σv(xz)", "Vertical mirror plane (xz-plane)"
+                        return "sigmav(xz)", "Vertical mirror plane (xz-plane)"
                 elif main_idx == 2:  # z方向が法線 → xy面
                     if principal_axis == 'z':
-                        return "σh(xy)", "Horizontal mirror plane (xy-plane)"
+                        return "sigmah(xy)", "Horizontal mirror plane (xy-plane)"
                     else:
-                        return "σv(xy)", "Vertical mirror plane (xy-plane)"
+                        return "sigmav(xy)", "Vertical mirror plane (xy-plane)"
                 else:
                     # 対角鏡映面の場合
                     if abs(normal[0]) > 0.5 and abs(normal[1]) > 0.5:
-                        return "σd", "Dihedral mirror plane"
+                        return "sigmad", "Dihedral mirror plane"
                     else:
-                        return "σv", "Vertical mirror plane"
+                        return "sigmav", "Vertical mirror plane"
         
         # 回転反映操作の判定
         elif trace == -1:  # S4操作
@@ -188,11 +188,11 @@ def analyze_all_operations(principal_axis='z'):
 def find_operation_type(target_matrix, principal_axis='z'):
     """特定の行列の操作タイプを判定"""
     op_name, description = classify_symmetry_operation(target_matrix, principal_axis)
-    print(f"Matrix:")
-    for row in target_matrix:
-        print(f"  {row}")
-    print(f"Operation: {op_name}")
-    print(f"Description: {description}")
+    # print(f"Matrix:")
+    # for row in target_matrix:
+    #     print(f"  {row}")
+    # print(f"Operation: {op_name}")
+    # print(f"Description: {description}")
     return op_name, description
 
 def compare_principal_axes():
@@ -219,34 +219,36 @@ def compare_principal_axes():
             print(f"  Principal axis {axis}: {op_name}")
         print("-" * 30)
 
-# 主軸をz軸として分析
-print("Analysis with z-axis as principal axis:")
-operations_z = analyze_all_operations('z')
 
-# 鏡映面の分類比較
-print("\n" + "="*70)
-compare_principal_axes()
-
-# 統計情報
-print("\nSummary (Principal axis: z):")
-print("=" * 30)
-for op_name, op_list in sorted(operations_z.items()):
-    print(f"{op_name}: {len(op_list)} operations")
-
-# 特定の行列の例
-print("\nExample classifications (Principal axis: z):")
-print("=" * 40)
-
-examples = [
-    np.array([[-1, 0, 0], [0, 0, 1], [0, 1, 0]]),
-    np.array([[-1, 0, 0], [0, 0, -1], [0, -1, 0]]),
-    np.array([[0, -1, 0], [-1, 0, 0], [0, 0, -1]]),
-    np.array([[0, 1, 0], [1, 0, 0], [0, 0, -1]]),
-    np.array([[0, 0, 1], [0, -1, 0], [1, 0, 0]]),
-    np.array([[1, 0, 0], [0, -1, 0], [0, 0, -1]]),  # σ(xz)
-    np.array([[-1, 0, 0], [0, 1, 0], [0, 0, -1]])   # σ(yz)
-]
-
-for i, matrix in enumerate(examples):
-    print(f"\nExample {i+1}:")
-    find_operation_type(matrix, 'z')
+if __name__ == "__main__":
+    # 主軸をz軸として分析
+    print("Analysis with z-axis as principal axis:")
+    operations_z = analyze_all_operations('z')
+    
+    # 鏡映面の分類比較
+    print("\n" + "="*70)
+    compare_principal_axes()
+    
+    # 統計情報
+    print("\nSummary (Principal axis: z):")
+    print("=" * 30)
+    for op_name, op_list in sorted(operations_z.items()):
+        print(f"{op_name}: {len(op_list)} operations")
+    
+    # 特定の行列の例
+    print("\nExample classifications (Principal axis: z):")
+    print("=" * 40)
+    
+    examples = [
+        np.array([[-1, 0, 0], [0, 0, 1], [0, 1, 0]]),
+        np.array([[-1, 0, 0], [0, 0, -1], [0, -1, 0]]),
+        np.array([[0, -1, 0], [-1, 0, 0], [0, 0, -1]]),
+        np.array([[0, 1, 0], [1, 0, 0], [0, 0, -1]]),
+        np.array([[0, 0, 1], [0, -1, 0], [1, 0, 0]]),
+        np.array([[1, 0, 0], [0, -1, 0], [0, 0, -1]]),  # σ(xz)
+        np.array([[-1, 0, 0], [0, 1, 0], [0, 0, -1]])   # σ(yz)
+    ]
+    
+    for i, matrix in enumerate(examples):
+        print(f"\nExample {i+1}:")
+        find_operation_type(matrix, 'z')

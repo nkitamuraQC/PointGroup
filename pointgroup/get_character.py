@@ -11,6 +11,7 @@ import numpy as np
 from .pglib import tr2o3
 from .schonflies import point_group_map
 from .utils import logger
+from .pglib import find_operation_type
 
 class GetCharacter:
     """
@@ -176,11 +177,12 @@ class GetCharacter:
             result = apply_for_orb(amps, rot, trs)
             logger.info(f"before: {amps}")
             logger.info(f"after: {result}")
+            op_name, _ = find_operation_type(self.rot_o3[op_idx])
             if self.use_trace:
                 charcter = check_symmetry2(amps, result)
             else:
                 charcter = check_symmetry(amps, result)
-            logger.info(f"character: {charcter}")
+            logger.info(f"op_name: {op_name}, character: {charcter}")
             return charcter
 
         elif mode == "grid":

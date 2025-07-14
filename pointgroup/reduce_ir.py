@@ -1,9 +1,9 @@
 from .get_character import GetCharacter
 from .schonflies import point_group_map
-from .pglib import point_group, assign_op_name, is_similar_symmetry_name
+from .pglib import point_group, find_operation_type
 from .sym_op import apply_for_orb
 import numpy as np
-
+import copy
 
 class GetIR:
     def __init__(self, getc: GetCharacter):
@@ -30,17 +30,48 @@ class GetIR:
         ir_ch = []
         rot_o3 = self.getc.rot_o3
         for i in range(rot_o3.shape[0]):
-            name = assign_op_name(rot_o3[i], self.pg)
-            print(name, rot_o3[i])
+            op_name, disc = find_operation_type(rot_o3[i])
+            op_name_save = copy.copy(op_name)
             for k, v in self.ir_ch_all.items():
-                # print(name, k, is_similar_symmetry_name(k, name))
-                if is_similar_symmetry_name(k, name):
-                    ch = self.ir_ch_all[name]
+                try:
+                    int(k[0])
+                    k = k[1:]
+                except ValueError:
+                    pass
+                if "(" in op_name and "(" not in k:
+                    op_name_save = op_name_save.split("(")[0]
+                if "rotation around principal" in disc:
+                    op_name = op_name_save
+                    op_name += "_1"
+                elif "(perpendicular to principal axis)" in disc:
+                    op_name = op_name_save
+                    op_name += "_2"
+                else:
+                    op_name = op_name_save
+                if k == op_name:
+                    # print(op_name, k)
+                    ch = v
                     ir_ch.append(ch[ir_idx])
+                    break
         return ir_ch
+    
+    def _get_ir_ch_old(self, ir_idx):
+        ir_ch = []
+        for ir, ch in self.ir_ch_all.items():
+            try:
+                n = int(ir[0])
+            except ValueError:
+                n = 1
+            for i in range(n):
+                ir_ch.append(ch[ir_idx])
+        
+        
+        return np.array(ir_ch)
 
     def reduce_ir(self, ch: np.ndarray, ir_idx=0):
-        self.h = self._get_h()
-        self.ir_ch = self._get_ir_ch(ir_idx)
+        h = self._get_h()
+        ir_ch = self._get_ir_ch_old(ir_idx)
         # print(ch, self.ir_ch)
-        return np.dot(ch, self.ir_ch) / self.h
+        print(ir_ch)
+
+        return np.dot(ch, ir_ch) / h
