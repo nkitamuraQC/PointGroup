@@ -175,6 +175,6 @@ def test_overall3():
 
 
 if __name__ == "__main__":
-    test_overall()
+    # test_overall()
     # test_overall2()
-    # test_overall3()
+    test_overall3()
