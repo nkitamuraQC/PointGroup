@@ -1,6 +1,6 @@
 from .get_character import GetCharacter
 from .schonflies import point_group_map
-from .pglib import point_group, get_rep
+from .pglib import point_group
 from .sym_op import apply_for_orb, get_diff
 import numpy as np
 

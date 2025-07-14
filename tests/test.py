@@ -1,5 +1,5 @@
 from pointgroup import (
-    GetSALC,
+    # GetSALC,
     GetIR,
     GetCharacter,
     TBModel,
