@@ -78,6 +78,11 @@ def classify_symmetry_operation(matrix, principal_axis='z'):
             # 主軸方向を判定
             axis_abs = np.abs(axis)
             main_axis_idx = np.argmax(axis_abs)
+            prime = 0
+            if abs(axis[main_axis_idx] - 1) <= 1e-6 and main_axis_idx != principal_axis:
+                prime += 1
+            elif main_axis_idx != principal_axis:
+                prime = 2
             axis_names = ['x', 'y', 'z']
             axis_name = axis_names[main_axis_idx]
             
@@ -85,9 +90,12 @@ def classify_symmetry_operation(matrix, principal_axis='z'):
             if abs(angle - 180) < 1e-6:
                 # 主回転軸の場合は区別
                 if axis_name == principal_axis:
-                    return f"C2", f"180° rotation around principal {axis_name}-axis"
+                    return f"C2({axis_name})", f"180° rotation around principal {axis_name}-axis; {axis}"
                 else:
-                    return f"C2({axis_name})", f"180° rotation around {axis_name}-axis (perpendicular to principal axis)"
+                    if prime == 1:
+                        return f"C2_1({axis_name})", f"180° rotation around {axis_name}-axis (perpendicular to principal axis) {axis}"
+                    elif prime == 2:
+                        return f"C2_2({axis_name})", f"180° rotation around {axis_name}-axis (perpendicular to principal axis) {axis}"
             elif abs(angle - 120) < 1e-6:
                 return f"C3({axis_name})", f"120° rotation around {axis_name}-axis"
             elif abs(angle - 90) < 1e-6:
@@ -105,6 +113,8 @@ def classify_symmetry_operation(matrix, principal_axis='z'):
             if normal is not None:
                 normal_abs = np.abs(normal)
                 main_idx = np.argmax(normal_abs)
+                if abs(normal_abs[main_idx]) < 0.9:
+                    main_idx = None
                 axis_names = ['x', 'y', 'z']
                 
                 # 主回転軸との関係で分類
