@@ -80,7 +80,7 @@ def classify_symmetry_operation(matrix, principal_axis='z'):
             main_axis_idx = np.argmax(axis_abs)
             prime = 0
             if abs(axis[main_axis_idx] - 1) <= 1e-6 and main_axis_idx != principal_axis:
-                prime += 1
+                prime = 1
             elif main_axis_idx != principal_axis:
                 prime = 2
             axis_names = ['x', 'y', 'z']
@@ -103,7 +103,14 @@ def classify_symmetry_operation(matrix, principal_axis='z'):
             elif abs(angle - 60) < 1e-6:
                 return f"C6({axis_name})", f"60° rotation around {axis_name}-axis"
             else:
-                return f"C({axis_name})", f"{angle:.1f}° rotation around {axis_name}-axis"
+                if trace == -1:
+                    return f"C2({axis_name})", f"{angle:.1f}° rotation around {axis_name}-axis"
+                if trace == 0:
+                    return f"C3({axis_name})", f"{angle:.1f}° rotation around {axis_name}-axis"
+                if trace == 1:
+                    return f"C4({axis_name})", f"{angle:.1f}° rotation around {axis_name}-axis"
+                if trace == 2:
+                    return f"C6({axis_name})", f"{angle:.1f}° rotation around {axis_name}-axis"
     
     # 行列式が負の場合（反転を含む操作）
     else:
