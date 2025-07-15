@@ -1,7 +1,7 @@
 from .pythtb_respack import w90, tb_model
 from seekpath import get_path
 import numpy as np
-
+import spglib
 
 class TBModel:
     """
@@ -18,6 +18,8 @@ class TBModel:
         site_species: list = [0],
         site_nlm: list = [(1, 0, 0)],
         pythtb_obj: tb_model = None,
+        lat: list = None, # [[1, 0, 0],[0, 1, 0],[0, 0, 1]],
+        orb: list = None, # [[0, 0, 0]]
     ):
         """
         Parameters
@@ -53,6 +55,31 @@ class TBModel:
         self.path_sym = None
         self.path_coord = None
         self.kpts = None
+        self.lat = lat
+        self.orb = orb
+        self.do_standard = False
+
+    def init_tbmodel(self):
+        assert self.lat is not None
+        assert self.orb is not None
+        if self.do_standard:
+            cell = (self.lat, self.orb, self.site_species)
+            ret = spglib.spglib.standardize_cell(cell)
+            self.lat = ret[0]
+            self.orb = ret[1]
+        
+        self.pythtb_obj = tb_model(3, 3, self.lat, self.orb)
+        return
+    
+    def set_onsite(self, potentials: list):
+        self.pythtb_obj.set_onsite(potentials)
+        return
+    
+    def set_hop(self, t: float, siteidx1: int, siteidx2: int, ind_R: list):
+        self.pythtb_obj.set_hop(t, siteidx1, siteidx2, ind_R)
+        return
+
+
 
     def gen_pythtb(self):
         """
