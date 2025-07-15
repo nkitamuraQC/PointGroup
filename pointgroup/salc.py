@@ -1,6 +1,6 @@
 from .get_character import GetCharacter
 from .schonflies import point_group_map
-from .pglib import point_group
+from .pglib import point_group, output_sym_op_name, find_operation_type
 from .sym_op import apply_for_orb, get_diff
 import numpy as np
 
@@ -52,31 +52,10 @@ class GetSALC:
         op_name : str or None
             一致する操作名（なければNone）
         """
-        reps = get_rep()[self.pg]
-        for rep_name, rep in reps.items():
-            diff = np.ravel(rep) - np.ravel(op)
-            if np.linalg.norm(diff) < 1e-6:
-                return rep_name
-        return None
-    
-    def _search_op2(self, op):
-        """
-        与えられたO(3)行列opに最も近い点群操作名を検索する。
-        Returns
-        -------
-        op_name : str or None
-            一致する操作名（なければNone）
-        """
-        reps = get_rep()[self.pg]
-        delta_list = []
-        rep_names = []
-        for rep_name, rep in reps.items():
-            diff = np.linalg.norm(np.ravel(rep) - np.ravel(op))
-            delta_list.append(diff)
-            rep_names.append(rep_name)
-        delta = np.array(delta_list)
-        idx = np.argmin(delta)
-        return rep_names[idx]
+        op_name, disc = find_operation_type(op)
+        op_name = output_sym_op_name(self.pg, op_name)
+        return op_name
+
 
     def make_salc_site(self, sym_idx=0):
         """
@@ -108,8 +87,7 @@ class GetSALC:
                 weights[(x, y, z)] = 0
         for samp in site_amps:
             for n in range(nops):
-                op_name = self._search_op2(rot_o3[n])
-                op_name = op_name.split()[0]
+                op_name = self._search_op(rot_o3[n])
                 applied = apply_for_orb(samp, rot[n], trs[n])
                 for xyz, amp in applied.items():
                     x, y, z = xyz
