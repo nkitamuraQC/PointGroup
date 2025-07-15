@@ -35,7 +35,7 @@ def output_sym_op_name(pg, sym_op_name):
         "Th": {"E": "E", "C3": "8C3", "C2": "3C2", "sigmah": "3sigmah", "S6": "8S6", "i": "i"},
         "O": {"E": "E", "C3": "8C3", "C2_2": "6C2_2", "C4": "6C4", "C2_1": "6C2_2"},
         "Td": {"E": "E", "C3": "8C3", "sigmad": "6sigmad", "S4": "6S4", "C2": "3C2"},
-        "Oh": {"E": "E", "C3": "8C3", "C2_1": "6C2", "C4": "6C4", "C2": "3C2", "i": "i", "S4": "S4", "S6": "8S6", "sigmah": "3sigmah", "sigmad": "6sigmad"},
+        "Oh": {"E": "E", "C3": "8C3", "C2_2": "6C2", "C4": "6C4", "C2": "3C2", "i": "i", "S4": "6S4", "S6": "8S6", "sigmah": "3sigmah", "sigmad": "6sigmad", "sigmav(yz)": "3sigmah", "sigmav(xz)": "3sigmah"},
     }
     ret = ""
     if pg in mapping:

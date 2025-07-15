@@ -138,7 +138,9 @@ def classify_symmetry_operation(matrix, principal_axis='z'):
                     if abs(normal[0]) > 0.5 and abs(normal[1]) > 0.5:
                         return "sigmad", "Dihedral mirror plane"
                     else:
-                        return "sigmav", "Vertical mirror plane"
+                        return "sigmad", "Dihedral mirror plane"
+                    # else:
+                    #     return "sigmav", "Vertical mirror plane"
         
         # 回転反映操作の判定
         elif trace == -1:  # S4操作
@@ -150,28 +152,16 @@ def classify_symmetry_operation(matrix, principal_axis='z'):
             #     axis_names = ['x', 'y', 'z']
             #     axis_name = axis_names[main_axis_idx]
             #     return f"S4({axis_name})", f"90° rotation-reflection around {axis_name}-axis"
-            res = np.identity(3)
-            identity = np.identity(3)
-            for i in range(4):
-                res = np.dot(res, matrix)
-            if np.linalg.norm(res.flatten() - identity.flatten()) < 1e-6:
-                return "S4", "90° rotation-reflection"
+            return "S4", "90° rotation-reflection"
             
-            res = np.identity(3)
-            identity = np.identity(3)
-            for i in range(6):
-                res = np.dot(res, matrix)
-            if np.linalg.norm(res.flatten() - identity.flatten()) < 1e-6:
-                return "S6", "60° rotation-reflection"
+        elif abs(trace - 0.0) < 1e-6:
+            return "S6", "60° rotation-reflection"
 
-            res = np.identity(3)
-            identity = np.identity(3)
-            for i in range(3):
-                res = np.dot(res, matrix)
-            if np.linalg.norm(res.flatten() - identity.flatten()) < 1e-6:
-                return "S3", "120° rotation-reflection"
+        elif abs(trace + 2) < 1e-6:
+            return "S3", "120° rotation-reflection"
     
-    return "Unknown", "Unclassified operation"
+    # return "Unknown", "Unclassified operation"
+    raise ValueError("不正な表現行列を検知しました")
 
 def analyze_all_operations(principal_axis='z'):
     """全ての対称操作を分析
@@ -202,7 +192,7 @@ def analyze_all_operations(principal_axis='z'):
             print(f"     Matrix:")
             for row in matrix:
                 print(f"     {row}")
-            print()
+            # print()
     
     return operations
 
