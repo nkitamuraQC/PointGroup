@@ -170,7 +170,10 @@ class GetCharacter:
 
         rot = self.rot[op_idx]
         trs = self.trans[op_idx]
-        logger.info(f"pg: {point_group_map[self.pg]}")
+        try:
+            logger.info(f"pg: {point_group_map[self.pg]}")
+        except KeyError:
+            raise KeyError("Point group is not Found.")
         logger.info(f"rot: {rot}")
         logger.info(f"trs: {trs}")
         if mode == "site":

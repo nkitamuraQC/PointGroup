@@ -174,7 +174,7 @@ def test_overall3():
     return
 
 def test_overall4():
-    # Buckled layer
+    # Oh
     # real space is 3D
     # define lattice vectors
     lat=[[1.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,1.0]]
@@ -225,8 +225,53 @@ def test_overall4():
     return
 
 
+def test_overall5():
+    site_species = [1, 2, 3]
+    # define lattice vectors
+    lat=[[1.0, 0.0, 0.0],[0.0, 0.0, 1.0], [0.0, 0.0, 1.0]]
+    # define coordinates of orbitals
+    orb=[[0.0, 0.0, 0.0],[1.0/3.0, 0.0, 0.0],[2.0/3.0, 0.0, 0.0]]
+    
+    # make one dimensional tight-binding model
+    my_model=tb_model(3,3,lat,orb)
+    
+    # set model parameters
+    delta=2.0
+    t=-1.0
+
+    # set hoppings (one for each connected pair of orbitals)
+    # (amplitude, i, j, [lattice vector to cell containing j])
+    my_model.set_hop(t, 0, 1, [0, 0, 0])
+    my_model.set_hop(t, 1, 2, [0, 0, 0])
+    my_model.set_hop(t, 2, 0, [1, 0, 0])
+
+    tb = TBModel(pythtb_obj=my_model, site_species=site_species)
+    tb.gen_pythtb()
+
+    gcclass = GetCharacter(tb)
+    n = gcclass._get_symm_ops()
+    res = []
+    for i in range(n):
+        ch = gcclass.get_character(kidx=3, orb_idx=2, op_idx=i)
+        res.append(ch)
+    print(res.count(1))
+    print(res.count(-1))
+    ir = GetIR(gcclass)
+    h = ir._get_h()
+    nir = ir._get_ir()
+    ch = np.array(res)
+    w_chs = []
+    for i in range(nir):
+        w_ch = ir.reduce_ir(ch, ir_idx=i)
+        w_chs.append(w_ch)
+    print(w_chs)
+    return
+
+
+
 if __name__ == "__main__":
-    test_overall()
+    # test_overall()
     # test_overall2()
     # test_overall3()
     # test_overall4()
+    test_overall5()

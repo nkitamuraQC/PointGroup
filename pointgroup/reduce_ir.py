@@ -75,12 +75,12 @@ class GetIR:
         for i in range(rot_o3.shape[0]):
             op_name, disc = find_operation_type(rot_o3[i])
             op_name2 = output_sym_op_name(self.pg, op_name)
-            # print(op_name2)
+            print(f"{op_name2} {op_name}")
             for k, ch in self.ir_ch_all.items():
                 if k == op_name2:
                     # print(k, op_name, op_name2, disc, ch[ir_idx], ir_idx)
                     ir_ch.append(ch[ir_idx])
-
+        print()
         return np.array(ir_ch)
 
     def reduce_ir(self, ch: np.ndarray, ir_idx=0):
