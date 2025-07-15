@@ -88,6 +88,7 @@ def test_overall2():
 
     tb = TBModel(pythtb_obj=my_model, site_species=site_species, nk=nk)
     tb.gen_pythtb()
+    print("kpts: ", tb.kpts[0])
 
     gcclass = GetCharacter(tb)
     gcclass.use_trace = False
