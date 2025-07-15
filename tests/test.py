@@ -63,7 +63,7 @@ def test_overall():
 def test_overall2():
     # graphene
     # define lattice vectors
-    lat=[[1.0,0.0,0.0],[0.5,np.sqrt(3.0)/2.0,0.0],[0.0,0.0,10.0]]
+    lat=[[1.0,0.0,0.0],[0.5,np.sqrt(3.0)/2.0,0.0],[0.0,0.0,1.0]]
     # define coordinates of orbitals
     orb=[[1./3.,1./3.,0.0],[2./3.,2./3.0,0.0]]
     site_species = [1, 1]
@@ -175,6 +175,6 @@ def test_overall3():
 
 
 if __name__ == "__main__":
-    # test_overall()
+    test_overall()
     # test_overall2()
-    test_overall3()
+    # test_overall3()

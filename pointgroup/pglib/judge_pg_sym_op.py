@@ -143,22 +143,33 @@ def classify_symmetry_operation(matrix, principal_axis='z'):
         # 回転反映操作の判定
         elif trace == -1:  # S4操作
             # 回転反映軸を求める
-            axis, _ = get_rotation_axis_and_angle(-matrix)  # -matrixで回転部分を取得
-            if axis is not None:
-                axis_abs = np.abs(axis)
-                main_axis_idx = np.argmax(axis_abs)
-                axis_names = ['x', 'y', 'z']
-                axis_name = axis_names[main_axis_idx]
-                return f"S4({axis_name})", f"90° rotation-reflection around {axis_name}-axis"
-        
-        elif trace == 0:  # S6操作
-            axis, _ = get_rotation_axis_and_angle(-matrix)
-            if axis is not None:
-                axis_abs = np.abs(axis)
-                main_axis_idx = np.argmax(axis_abs)
-                axis_names = ['x', 'y', 'z']
-                axis_name = axis_names[main_axis_idx]
-                return f"S6({axis_name})", f"60° rotation-reflection around {axis_name}-axis"
+            # axis, _ = get_rotation_axis_and_angle(-matrix)  # -matrixで回転部分を取得
+            # if axis is not None:
+            #     axis_abs = np.abs(axis)
+            #     main_axis_idx = np.argmax(axis_abs)
+            #     axis_names = ['x', 'y', 'z']
+            #     axis_name = axis_names[main_axis_idx]
+            #     return f"S4({axis_name})", f"90° rotation-reflection around {axis_name}-axis"
+            res = np.identity(3)
+            identity = np.identity(3)
+            for i in range(4):
+                res = np.dot(res, matrix)
+            if np.linalg.norm(res.flatten() - identity.flatten()) < 1e-6:
+                return "S4", "90° rotation-reflection"
+            
+            res = np.identity(3)
+            identity = np.identity(3)
+            for i in range(6):
+                res = np.dot(res, matrix)
+            if np.linalg.norm(res.flatten() - identity.flatten()) < 1e-6:
+                return "S6", "60° rotation-reflection"
+
+            res = np.identity(3)
+            identity = np.identity(3)
+            for i in range(3):
+                res = np.dot(res, matrix)
+            if np.linalg.norm(res.flatten() - identity.flatten()) < 1e-6:
+                return "S3", "120° rotation-reflection"
     
     return "Unknown", "Unclassified operation"
 
