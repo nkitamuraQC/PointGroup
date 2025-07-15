@@ -88,19 +88,19 @@ def test_overall2():
 
     tb = TBModel(pythtb_obj=my_model, site_species=site_species, nk=nk)
     tb.gen_pythtb()
-    print("kpts: ", tb.kpts[0])
+    print("kpts: ", tb.kpts[15])
 
     gcclass = GetCharacter(tb)
     gcclass.use_trace = False
     n = gcclass._get_symm_ops()
     res1 = []
     for i in range(n):
-        ch = gcclass.get_character(kidx=0, orb_idx=0, op_idx=i)
+        ch = gcclass.get_character(kidx=15, orb_idx=0, op_idx=i)
         res1.append(ch)
     
     res2 = []
     for i in range(n):
-        ch = gcclass.get_character(kidx=0, orb_idx=1, op_idx=i)
+        ch = gcclass.get_character(kidx=15, orb_idx=1, op_idx=i)
         res2.append(ch)
     print(res1)
     print(res1.count(1))
