@@ -90,6 +90,7 @@ def test_overall2():
     tb.gen_pythtb()
 
     gcclass = GetCharacter(tb)
+    gcclass.use_trace = False
     n = gcclass._get_symm_ops()
     res1 = []
     for i in range(n):
@@ -109,15 +110,15 @@ def test_overall2():
     print(res2.count(1))
     print(res2.count(-1))
     print(res2.count(2))
-    ir = GetIR(gcclass)
-    h = ir._get_h()
-    nir = ir._get_ir()
-    ch = np.array(res1)
-    w_chs = []
-    for i in range(nir):
-        w_ch = ir.reduce_ir(ch, ir_idx=i)
-        w_chs.append(w_ch)
-    print(w_chs)
+    # ir = GetIR(gcclass)
+    # h = ir._get_h()
+    # nir = ir._get_ir()
+    # ch = np.array(res1)
+    # w_chs = []
+    # for i in range(nir):
+    #     w_ch = ir.reduce_ir(ch, ir_idx=i)
+    #     w_chs.append(w_ch)
+    # print(w_chs)
 
     # salc = GetSALC(gcclass)
     # for i in range(12):
@@ -276,7 +277,7 @@ def test_overall5():
 
 if __name__ == "__main__":
     # test_overall()
-    # test_overall2()
+    test_overall2()
     # test_overall3()
     # test_overall4()
-    test_overall5()
+    # test_overall5()

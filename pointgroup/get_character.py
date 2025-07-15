@@ -180,12 +180,13 @@ class GetCharacter:
             result = apply_for_orb(amps, rot, trs)
             logger.info(f"before: {amps}")
             logger.info(f"after: {result}")
-            op_name, _ = find_operation_type(self.rot_o3[op_idx])
             if self.use_trace:
+                op_name, _ = find_operation_type(self.rot_o3[op_idx])
                 charcter = check_symmetry2(amps, result)
+                logger.info(f"op_name: {op_name}, character: {charcter}")
             else:
                 charcter = check_symmetry(amps, result)
-            logger.info(f"op_name: {op_name}, character: {charcter}")
+                logger.info(f"character: {charcter}")
             return charcter
 
         elif mode == "grid":
