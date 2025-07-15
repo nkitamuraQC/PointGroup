@@ -6,6 +6,7 @@ from pointgroup import (
     tb_model,
 )
 import numpy as np
+import spglib
 
 def test_overall():
     # Buckled layer
@@ -67,6 +68,10 @@ def test_overall2():
     # define coordinates of orbitals
     orb=[[1./3.,1./3.,0.0],[2./3.,2./3.0,0.0]]
     site_species = [1, 1]
+    cell = (lat, orb, site_species)
+    ret = spglib.spglib.standardize_cell(cell)
+    lat = ret[0]
+    orb = ret[1]
     my_model=tb_model(3, 3, lat, orb)
     delta=0.0
     t=-1.0
@@ -228,7 +233,7 @@ def test_overall4():
 def test_overall5():
     site_species = [1, 2, 3]
     # define lattice vectors
-    lat=[[1.0, 0.0, 0.0],[0.0, 0.0, 1.0], [0.0, 0.0, 1.0]]
+    lat=[[1.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]]
     # define coordinates of orbitals
     orb=[[0.0, 0.0, 0.0],[1.0/3.0, 0.0, 0.0],[2.0/3.0, 0.0, 0.0]]
     

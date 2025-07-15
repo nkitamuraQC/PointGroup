@@ -168,7 +168,7 @@ def classify_symmetry_operation(matrix, principal_axis='z'):
             return "S3", "120° rotation-reflection"
     
     # return "Unknown", "Unclassified operation"
-    raise ValueError("不正な表現行列を検知しました")
+    raise ValueError(f"不正な表現行列を検知しました: {matrix}")
 
 def analyze_all_operations(principal_axis='z'):
     """全ての対称操作を分析
