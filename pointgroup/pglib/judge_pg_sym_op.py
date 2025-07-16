@@ -161,7 +161,7 @@ def classify_symmetry_operation(matrix, principal_axis='z'):
             #     return f"S4({axis_name})", f"90° rotation-reflection around {axis_name}-axis"
             return "S4", "90° rotation-reflection"
             
-        elif abs(trace - 0.0) < 1e-6:
+        elif abs(trace) < 1e-6:
             return "S6", "60° rotation-reflection"
 
         elif abs(trace + 2) < 1e-6:
