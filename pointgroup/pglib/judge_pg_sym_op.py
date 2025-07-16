@@ -113,7 +113,7 @@ def classify_symmetry_operation(matrix, principal_axis='z'):
                     return f"C6({axis_name})", f"{angle:.1f}° rotation around {axis_name}-axis"
     
     # 行列式が負の場合（反転を含む操作）
-    else:
+    elif det < 0:
         # 鏡映操作の判定
         if trace == 1:  # σ操作
             normal = get_mirror_plane_normal(matrix)
