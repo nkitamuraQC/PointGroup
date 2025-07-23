@@ -127,6 +127,51 @@ def test_overall2():
     #     print(w)
     return
 
+
+def test_overall2_2(k_eps=0.001):
+    # graphene
+    # define lattice vectors
+    lat=[[1.0,0.0,0.0],[0.5,np.sqrt(3.0)/2.0,0.0],[0.0,0.0,1.0]]
+    # define coordinates of orbitals
+    orb=[[1./3.,1./3.,0.0],[2./3.,2./3.0,0.0]]
+    site_species = [1, 1]
+    cell = (lat, orb, site_species)
+    ret = spglib.spglib.standardize_cell(cell)
+    lat = ret[0]
+    orb = ret[1]
+    my_model=tb_model(3, 3, lat, orb)
+    delta=0.0
+    t=-1.0
+    
+    # set on-site energies
+    my_model.set_onsite([-delta,delta])
+    # set hoppings (one for each connected pair of orbitals)
+    # (amplitude, i, j, [lattice vector to cell containing j])
+    my_model.set_hop(t, 0, 1, [ 0, 0, 0])
+    my_model.set_hop(t, 1, 0, [ 1, 0, 0])
+    my_model.set_hop(t, 1, 0, [ 0, 1, 0])
+
+    nk = [1, 1, 1]
+
+    tb = TBModel(pythtb_obj=my_model, site_species=site_species, nk=nk)
+    k = [1/3-k_eps, 1/3, 0]
+    tb.gen_pythtb(k=k)
+
+    gcclass = GetCharacter(tb)
+    gcclass.use_trace = False
+    n = gcclass._get_symm_ops()
+    res1 = []
+    for i in range(n):
+        ch = gcclass.get_character(kidx=0, orb_idx=0, op_idx=i)
+        res1.append(ch)
+    
+    res2 = []
+    for i in range(n):
+        ch = gcclass.get_character(kidx=0, orb_idx=1, op_idx=i)
+        res2.append(ch)
+    return res1.count(1), res2.count(1)
+
+
 def test_overall3():
     # Checkerboard
     # define lattice vectors
@@ -279,6 +324,16 @@ def test_overall5():
 if __name__ == "__main__":
     # test_overall()
     # test_overall2()
-    test_overall3()
+    n = 100
+    c1_list = []
+    c2_list = []
+    for i in range(n):
+        eps = 0.001 * (i - n/2)
+        c1, c2 = test_overall2_2(k_eps=eps)
+        c1_list.append(c1)
+        c2_list.append(c2)
+    for i in range(n):
+        print(f"eps: {0.001 * (i - n/2):.3f}, c1: {c1_list[i]}, c2: {c2_list[i]}")
+    # test_overall3()
     # test_overall4()
     # test_overall5()

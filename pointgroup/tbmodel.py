@@ -81,7 +81,7 @@ class TBModel:
 
 
 
-    def gen_pythtb(self):
+    def gen_pythtb(self, k=None):
         """
         pythtbオブジェクトを生成し、格子・軌道・k点・バンド情報を初期化する。
         Returns
@@ -95,7 +95,7 @@ class TBModel:
         self.pos = self.pythtb_obj._orb
         # self.pos_with_corner = self._fill_corners()
         self._get_uniform_kpts()
-        eval = self._get_bands()
+        eval = self._get_bands(k=k)
         return eval
 
     def _fill_corners(self):
@@ -151,7 +151,7 @@ class TBModel:
         self.kpts = self.pythtb_obj.k_uniform_mesh(self.nk)
         return
 
-    def _get_bands(self):
+    def _get_bands(self, k=None):
         """
         全k点でバンド計算を行い、固有ベクトル（波動関数）をself.Umatに格納する。
         Returns
@@ -159,6 +159,8 @@ class TBModel:
         eval : ndarray
             バンドエネルギー配列
         """
+        if k is not None:
+            self.kpts = [k]
         (eval, evec) = self.pythtb_obj.solve_all(self.kpts, eig_vectors=True)
         self.Umat = evec
         return eval
