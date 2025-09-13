@@ -1,21 +1,81 @@
 # PointGroup
-第一原理計算と対称性計算の結合を目指す
-- spglib.spglib.get_symmetry()
-- spglib.spglib.SpglibDataset
-- spglib.spglib.get_symmetry_dataset()
-## 手順
-- 対称操作で波動関数の指標表入手
-- 対称性を指標ベクトルで表す(<-これで十分)
-- SALCを作る->sparse-HF
-- datasetから点群を出す
-  - シュライバー無機化学から点群の指標表を実装
-- 可能なら、
-  - 点群の既約表現をLLMに生成させる
-  - 点群の操作とspglibの操作を対応づけて既約表現の記号を得る
-  - k小群の特定
-    - フル対称操作を使って指標表を作る(対称操作とトレースの組み)
-    - 指標をソートしてnormをとって最も近いものを選ぶ
-## 群論メモ
-- 正準分子軌道は、群の既約表現に従うように構築されている
-- 異なる既約表現の指標(表現行列のトレース)の内積はゼロ
-- 可約表現の分解やSALCの構成においては表現行列のトレースが最重要
+
+## Overview
+
+**PointGroup** is a Python package for analyzing point group and space group characters (irreducible representations) from tight-binding models (Wannier90/pythtb/respack format). It provides utilities for symmetry operation analysis, character calculation, and group symbol conversion, leveraging libraries such as spglib and seekpath.
+
+---
+
+## Main Features
+
+- **Tight-binding Model Wrapper**  
+  - Wraps Wannier90/pythtb/respack models, manages lattice/orbital/band/k-path information (`TBModel` class).
+- **Automatic Point/Space Group Detection**  
+  - Uses spglib to detect international and Schonflies symbols and all symmetry operations (rotation/translation).
+- **Character Calculation**  
+  - Computes the character (trace) for a given k-point, band, and symmetry operation (`GetCharacter` class).
+- **Symmetry Operation Classification**  
+  - Classifies symmetry operations (rotation, mirror, inversion, etc.) and converts to Schonflies/international symbols.
+- **Visualization Support**  
+  - Utilities for structure visualization (e.g., CIF export via ASE).
+- **Extended Character Tables**  
+  - Built-in character tables for major point groups (`pg_ch_extra`).
+
+---
+
+## Directory Structure
+
+```
+pointgroup/
+    __init__.py
+    get_character.py      # Main class for character calculation
+    tbmodel.py            # Tight-binding model wrapper
+    sym_op.py             # Symmetry operation utilities
+    schonflies.py         # Schonflies symbol conversion
+    utils.py              # Logging/visualization utilities
+    pglib/                # Point group helper modules
+        judge_pg_sym_op.py
+        output_manager.py
+        pg_ch_extra.py    # Character tables
+        transform.py
+requirements.txt
+README.md
+```
+
+---
+
+## Example Usage
+
+```python
+from pointgroup.tbmodel import TBModel
+from pointgroup.get_character import GetCharacter
+
+tb = TBModel(wannier_path="...", wannier_prefix="...")
+tb.gen_pythtb()
+gc = GetCharacter(tb)
+char = gc.get_character(kidx=0, orb_idx=0, op_idx=0)
+print("Character:", char)
+```
+
+---
+
+## Dependencies
+- numpy
+- spglib
+- seekpath
+- ase
+- pythtb, respack (optional)
+
+---
+
+## License
+MIT License (planned)
+
+---
+
+## Notes
+- This package is intended for research in quantum chemistry and solid-state physics.
+- For details, see docstrings and test codes in each module.
+
+---
+
