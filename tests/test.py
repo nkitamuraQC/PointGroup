@@ -169,7 +169,7 @@ def test_overall2_2(k_eps=0.001):
     for i in range(n):
         ch = gcclass.get_character(kidx=0, orb_idx=1, op_idx=i)
         res2.append(ch)
-    return res1.count(1), res2.count(1)
+    return res1, res2,res1.count(1), res2.count(1)
 
 
 def test_overall3():
@@ -329,11 +329,11 @@ if __name__ == "__main__":
     c2_list = []
     for i in range(n):
         eps = 0.001 * (i - n/2)
-        c1, c2 = test_overall2_2(k_eps=eps)
+        res1, res2, c1, c2 = test_overall2_2(k_eps=eps)
         c1_list.append(c1)
         c2_list.append(c2)
-    for i in range(n):
-        print(f"eps: {0.001 * (i - n/2):.3f}, c1: {c1_list[i]}, c2: {c2_list[i]}")
+        print(f"eps: {0.001 * (i - n/2):.3f}, c1: {c1}, c2: {c2}, {res1}, {res2}")
     # test_overall3()
     # test_overall4()
     # test_overall5()
+
