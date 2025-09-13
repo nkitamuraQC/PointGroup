@@ -69,7 +69,7 @@ print("Character:", char)
 ---
 
 ## License
-MIT License (planned)
+Under Consideration
 
 ---
 
