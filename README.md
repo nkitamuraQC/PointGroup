@@ -69,7 +69,7 @@ print("Character:", char)
 ---
 
 ## License
-Under Consideration
+- GPL-3.0 License
 
 ---
 
